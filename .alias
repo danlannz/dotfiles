@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+alias ls='gls --color'
+#alias ls='ls -al -G'
+alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
+alias showHiddenFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
+alias hideHiddenFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app'
+
+eval $(thefuck --alias)
