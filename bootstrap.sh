@@ -429,6 +429,11 @@ run_dotfile_scripts script/strap-after-setup
 # Install oh-my-zsh
 log "Installing ohmyzsh:"
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+git clone --recursive git://github.com/joel-porquet/zsh-dircolors-solarized $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
+logk
+
+log "Installing Powerline Font"
+wget -nc -P "$HOME/Library/Fonts" https://github.com/powerline/fonts/raw/master/Meslo%20Slashed/Meslo%20LG%20M%20Regular%20for%20Powerline.ttf
 logk
 
 SUCCESS="1"

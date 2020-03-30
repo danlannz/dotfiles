@@ -48,7 +48,7 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git bundler osx node npm nvm web-search)
+plugins=(git bundler osx node npm nvm web-search zsh-dircolors-solarized)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -82,7 +82,5 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-eval `gdircolors $ZSH/custom/plugins/dircolors-solarized/dircolors.ansi-dark`
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
