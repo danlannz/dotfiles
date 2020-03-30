@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+eval $(thefuck --alias)
+
+# node version manager
+export NVM_DIR="/Users/Daniel/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"

@@ -1,7 +1,7 @@
-# #!/bin/bash
+#!/bin/sh
 
 # based on this https://github.com/mikemcquaid/strap
-#/ Usage: bin/strap.sh [--debug]
+#/ Usage: bin/bootstrap.sh [--debug]
 #/ Install development dependencies on macOS.
 set -e
 
@@ -413,28 +413,20 @@ run_dotfile_scripts script/strap-after-setup
 # # TODO: automate quiet install https://gist.github.com/brysgo/9007731
 # xcode-select --install
 
-# # Install Homebrew (unattended)
-# log "Installing Homebrew:"
-# echo | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-# # Install Homebrew Bundle, Cask and Services tap.
-# log "Installing Homebrew taps and extensions:"
-# brew bundle --file=- <<RUBY
-# tap 'homebrew/cask'
-# tap 'homebrew/core'
-# tap 'homebrew/services'
-# RUBY
-# logk
-
 # Install oh-my-zsh
-log "Installing ohmyzsh:"
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-git clone --recursive git://github.com/joel-porquet/zsh-dircolors-solarized $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
-logk
+if [ ! -d ~/.oh-my-zsh ]; then
+  log "Installing ohmyzsh:"
+  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  git clone --recursive git://github.com/joel-porquet/zsh-dircolors-solarized $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  logk
+fi
 
-log "Installing Powerline Font"
-wget -nc -P "$HOME/Library/Fonts" https://github.com/powerline/fonts/raw/master/Meslo%20Slashed/Meslo%20LG%20M%20Regular%20for%20Powerline.ttf
-logk
+if [ ! -f "$HOME/Library/Fonts/Meslo LG M Regular for Powerline.ttf" ]; then
+  log "Installing Powerline Font"
+  wget -nc -P "$HOME/Library/Fonts" https://github.com/powerline/fonts/raw/master/Meslo%20Slashed/Meslo%20LG%20M%20Regular%20for%20Powerline.ttf
+  logk
+fi
 
 SUCCESS="1"
 log "You're good to go"

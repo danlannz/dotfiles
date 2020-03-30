@@ -1,14 +1,23 @@
-export COUCHBASE_BIN=/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin
+export LOCAL_BIN="/usr/local/bin"
+export LOCAL_SBIN="/usr/local/sbin"
 
+# Vulkan SDK
 export VULKAN_SDK=$HOME/vulkan_sdk/macOS
 export VULKAN_SDK_BIN=$VULKAN_SDK/bin
 export DYLD_LIBRARY_PATH=$VULKAN_SDK/lib:$DYLD_LIBRARY_PATH
 export VK_ICD_FILENAMES=$VULKAN_SDK/etc/vulkan/icd.d/MoltenVK_icd.json
 export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
 
+# Android CLI tools
+export ANDROID_HOME="/usr/local/opt/android-sdk"
+export ANDROID_NDK="/usr/local/opt/android-ndk"
+
+# JS dev tools
+export YARN_BIN="$HOME/.yarn/bin"
 export CWD_NODE_MODULES_BIN="./node_modules/.bin"
 
-export RVM_BIN=$HOME/.rvm/bin
+# Database CLI tools
 # export POSTGRES_BIN=/usr/local/opt/libpq/bin
+# export COUCHBASE_BIN=/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin
 
-export PATH=$PATH:COUCHBASE_BIN:$VULKAN_SDK_BIN:$CWD_NODE_MODULES_BIN:$RVM_BIN
+export PATH=$PATH:$LOCAL_BIN:$COUCHBASE_BIN:$VULKAN_SDK_BIN:$CWD_NODE_MODULES_BIN:$YARN_BIN:$LOCAL_SBIN
