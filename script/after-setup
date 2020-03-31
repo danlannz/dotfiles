@@ -9,9 +9,14 @@ if [ ! -d ~/.oh-my-zsh ]; then
   logk
 fi
 
-# Install powerline font
+# Install fonts
+if [ ! -f "$HOME/Library/Fonts/Meslo LG S Regular for Powerline.ttf" ]; then
+  log "Installing Font: Meslo LG S Regular for Powerline"
+  wget -nc -P "$HOME/Library/Fonts" https://github.com/powerline/fonts/raw/master/Meslo%20Slashed/Meslo%20LG%20S%20Regular%20for%20Powerline.ttf
+  logk
+fi
 if [ ! -f "$HOME/Library/Fonts/Meslo LG M Regular for Powerline.ttf" ]; then
-  log "Installing Powerline Font"
+  log "Installing Font: Meslo LG M Regular for Powerline"
   wget -nc -P "$HOME/Library/Fonts" https://github.com/powerline/fonts/raw/master/Meslo%20Slashed/Meslo%20LG%20M%20Regular%20for%20Powerline.ttf
   logk
 fi
