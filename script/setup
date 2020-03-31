@@ -25,13 +25,13 @@ for DOTFILE in *; do
   [ -d $DOTFILE ] && DOTFILE="$DOTFILE/"
   DIRFILE="$DOTFILESDIR/$DOTFILE"
 
-  echo $DOTFILE | egrep -q '(^script/$|\.txt$|\.md$)' && continue
+  echo $DOTFILE | egrep -q '(^.git/$|^script/$|\.txt$|\.md$)' && continue
   # echo $DOTFILE | grep -q 'vscode-settings' &&
   #      HOMEFILE="$VSCODE/settings.json" &&
   #      mkdir -p "$VSCODE"
 
-  echo $DOTFILE | grep -q '^[\.].*$' &&
-       HOMEFILE="$HOME/$DOTFILE"
+  grep -q '(^[^\.].*$)' && continue
+  echo $DOTFILE | grep -q '(^[\.].*$)' && HOMEFILE="$HOME/$DOTFILE"
 
   # if echo $DOTFILE | grep -q 'github-vscode-settings'
   # then
