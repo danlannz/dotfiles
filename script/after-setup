@@ -1,5 +1,8 @@
 #!/bin/sh
 
+log()   { STEP="$*"; sudo_refresh; echo "--> $*"; }
+logk()  { STEP="";   echo "OK"; }
+
 # Install oh-my-zsh
 if [ ! -d ~/.oh-my-zsh ]; then
   log "Installing ohmyzsh:"
