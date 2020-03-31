@@ -12,9 +12,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/danlannz/dotfiles/master/b
 
 ### TODO
 
-- Finish configs and test
+- Add Mackup for config sync https://github.com/lra/mackup
 - Add vscode configs
 - Add sublime text configs
 - Add Vim configs
-- Add Mackup for config sync https://github.com/lra/mackup
 - Maybe Stow??

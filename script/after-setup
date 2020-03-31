@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Install oh-my-zsh
+if [ ! -d ~/.oh-my-zsh ]; then
+  log "Installing ohmyzsh:"
+  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  git clone --recursive git://github.com/joel-porquet/zsh-dircolors-solarized $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  logk
+fi
+
+# Install powerline font
+if [ ! -f "$HOME/Library/Fonts/Meslo LG M Regular for Powerline.ttf" ]; then
+  log "Installing Powerline Font"
+  wget -nc -P "$HOME/Library/Fonts" https://github.com/powerline/fonts/raw/master/Meslo%20Slashed/Meslo%20LG%20M%20Regular%20for%20Powerline.ttf
+  logk
+fi
+
+# Install latest node LTS via NVM
+nvm install --lts --latest-npm

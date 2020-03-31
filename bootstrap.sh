@@ -399,34 +399,7 @@ if [ -n "$CUSTOM_BREW_COMMAND" ]; then
 fi
 
 # Run post-install dotfiles script
-run_dotfile_scripts script/strap-after-setup
-
-
-# ---------------------------------------------------------
-
-# # Install run software update
-# # TODO: Add -R for auto restart and continue script after restart
-# sudo softwareupdate -i -a
-
-# # Install Xcode Command Line Tools
-# # TODO: check if Xcode developer tools is already installed
-# # TODO: automate quiet install https://gist.github.com/brysgo/9007731
-# xcode-select --install
-
-# Install oh-my-zsh
-if [ ! -d ~/.oh-my-zsh ]; then
-  log "Installing ohmyzsh:"
-  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  git clone --recursive git://github.com/joel-porquet/zsh-dircolors-solarized $ZSH_CUSTOM/plugins/zsh-dircolors-solarized
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-  logk
-fi
-
-if [ ! -f "$HOME/Library/Fonts/Meslo LG M Regular for Powerline.ttf" ]; then
-  log "Installing Powerline Font"
-  wget -nc -P "$HOME/Library/Fonts" https://github.com/powerline/fonts/raw/master/Meslo%20Slashed/Meslo%20LG%20M%20Regular%20for%20Powerline.ttf
-  logk
-fi
+run_dotfile_scripts script/after-setup
 
 SUCCESS="1"
 log "You're good to go"
