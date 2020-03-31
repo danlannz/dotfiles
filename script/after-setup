@@ -25,4 +25,6 @@ if [ ! -f "$HOME/Library/Fonts/Meslo LG M Regular for Powerline.ttf" ]; then
 fi
 
 # Install latest node LTS via NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # load nvm
 nvm install --lts --latest-npm
