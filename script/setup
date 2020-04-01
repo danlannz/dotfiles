@@ -9,35 +9,13 @@ DOTFILESDIR=$(pwd -P)
 [ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
 uname -s | grep -q "_NT-" && export WINDOWS=1
 
-# if [ $MACOS ]
-# then
-#   VSCODE="$HOME/Library/Application Support/Code/User"
-# elif [ $LINUX ]
-# then
-#   VSCODE="$HOME/.config/Code/User"
-# elif [ $WINDOWS ]
-# then
-#   VSCODE="$APPDATA/Code/User"
-# fi
-
-for DOTFILE in *; do
-  HOMEFILE="$HOME/.$DOTFILE"
+for DOTFILE in $(ls -a); do
+  HOMEFILE="$HOME/$DOTFILE"
   [ -d $DOTFILE ] && DOTFILE="$DOTFILE/"
   DIRFILE="$DOTFILESDIR/$DOTFILE"
-
-  echo $DOTFILE | egrep -q '(^.git/$|^script/$|\.txt$|\.md$)' && continue
-  # echo $DOTFILE | grep -q 'vscode-settings' &&
-  #      HOMEFILE="$VSCODE/settings.json" &&
-  #      mkdir -p "$VSCODE"
-
-  grep -q '(^[^\.].*$)' && continue
-  echo $DOTFILE | grep -q '(^[\.].*$)' && HOMEFILE="$HOME/$DOTFILE"
-
-  # if echo $DOTFILE | grep -q 'github-vscode-settings'
-  # then
-  #   [ -d "$HOME/GitHub/github" ] || continue
-  #   HOMEFILE="$HOME/GitHub/github/.vscode"
-  # fi
+  echo $DOTFILE | egrep -q '(^./$|^../$|^.git/$|^.gitignore$)' && continue
+  echo $DOTFILE | egrep -q '(^[^\.].*$)' && continue
+  echo $DOTFILE | egrep -q '(^[\.].*$)' && HOMEFILE="$HOME/$DOTFILE"
 
   if [ $UNIX ]
   then
