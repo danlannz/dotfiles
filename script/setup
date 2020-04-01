@@ -1,6 +1,6 @@
 #!/bin/sh
-# Install all dotfiles into the home directory
 
+# Install all dotfiles into the home directory
 DOTFILESDIRREL=$(dirname $0)
 cd $DOTFILESDIRREL/..
 DOTFILESDIR=$(pwd -P)

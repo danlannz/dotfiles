@@ -1,3 +1,4 @@
+#!/bin/sh
 export LOCAL_BIN="/usr/local/bin"
 export LOCAL_SBIN="/usr/local/sbin"
 
