@@ -4,7 +4,7 @@
 
 Daniel Landers dotfiles, currently local OSX only
 
-Run the following command to bootstrap a new machine
+Run the following command in a terminal to bootstrap a new machine
 
 ```
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/danlannz/dotfiles/master/bootstrap.sh)"
@@ -12,6 +12,5 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/danlannz/dotfiles/master/b
 
 ### TODO
 
-- Configure Mackup with cloud storage https://github.com/lra/mackup
-- Add vscode configs
-- Add sublime text configs
+- restore vscode extensions
+- credential management
