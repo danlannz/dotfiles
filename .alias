@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-alias dircolors=gdircolors
 alias ls='gls -ap --color=auto'
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
 alias showHiddenFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
