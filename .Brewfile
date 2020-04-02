@@ -82,7 +82,6 @@ cask "vlc"
 # cask "vmware-fusion"
 # cask "vnc-viewer"
 cask "whatsapp"
-cask "zoomus"
 
 # mas "1Blocker", id: 1107421413
 # mas "1Password 7", id: 1333542190
