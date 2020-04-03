@@ -62,6 +62,7 @@ cask "insomnia"
 cask "iterm2"
 # cask "keepingyouawake"
 # cask "orka"
+cask "plex-media-server"
 cask "postgres"
 # cask "sizeup" # compare with divvy and hyperdock
 cask "shuttle"
