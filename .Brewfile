@@ -85,6 +85,7 @@ cask "whatsapp"
 
 # mas "1Blocker", id: 1107421413
 # mas "1Password 7", id: 1333542190
+mas "Airmail 4", id: 918858936
 mas "Amphetamine", id: 937984704
 # mas "Pixelmator Pro", id: 1289583905
 mas "Slack", id: 803453959
