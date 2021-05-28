@@ -1,0 +1,2 @@
+# Show touches on iOS simulator
+defaults write com.apple.iphonesimulator ShowSingleTouches 1

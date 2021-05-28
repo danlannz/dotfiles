@@ -50,9 +50,10 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git bundler osx node npm nvm web-search zsh-dircolors-solarized zsh-syntax-highlighting)
+plugins=(bundler fzf git node npm nvm osx web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # User configuration
 
@@ -79,9 +80,9 @@ source $ZSH/oh-my-zsh.sh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 [[ -s ~/.alias ]] && source ~/.alias
-
 [[ -s ~/.path ]] && source ~/.path
 [[ -s ~/.functions ]] && source ~/.functions
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-eval "$(rbenv init -)"
+
+export REACT_EDITOR=code
