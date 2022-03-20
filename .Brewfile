@@ -64,12 +64,13 @@ cask "adoptopenjdk8"
 cask "android-file-transfer"
 cask "android-studio"
 cask "appcleaner"
-cask "barier"
+cask "barrier"
+cask "brave-browser"
 cask "dash"
-cask "docker"
 cask "divvy"
+cask "discord"
+cask "docker"
 cask "firefox"
-cask "gitkraken"
 cask "google-chrome"
 cask "hyperdock"
 cask "insomnia"
@@ -92,6 +93,7 @@ cask "spotify"
 cask "the-unarchiver"
 cask "tableplus"
 cask "transmission"
+cask "typora"
 # cask "vagrant"
 cask "virtualbox"
 cask "visual-studio-code"
@@ -105,7 +107,7 @@ cask "zoom"
 # mas "1Password 7", id: 1333542190
 # mas "Airmail 4", id: 918858936
 mas "Amphetamine", id: 937984704
-msa "Harvest", id: 506189836
+mas "Harvest", id: 506189836
 # mas "Pixelmator Pro", id: 1289583905
 mas "Slack", id: 803453959
 # mas "StopTheMadness", id: 1376402589

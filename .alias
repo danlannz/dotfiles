@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 alias xargs='xargs '
-alias gcob='gb | fzf-down | xargs gco'
-alias gcobr='gbr | fzf-down | xargs gco'
 alias ls='gls -ap --color=auto'
 alias ccat='pygmentize -g'
-alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
 alias showHiddenFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
 alias hideHiddenFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app'
+
+# Applications
+alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
+alias typora="open -a typora"
+
+
+alias gf="git fuzzy"

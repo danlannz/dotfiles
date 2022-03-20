@@ -20,6 +20,9 @@ export CWD_NODE_MODULES_BIN="./node_modules/.bin"
 # Git Fuzzy
 export GIT_FUZZY_BIN="$HOME/.oh-my-zsh/custom/plugins/git-fuzzy/bin"
 
+#GPG
+export GPG_TTY=$(tty)
+
 # Database CLI tools
 # export POSTGRES_BIN=/usr/local/opt/libpq/bin
 # export COUCHBASE_BIN=/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin

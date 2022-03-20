@@ -50,7 +50,8 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(bundler fzf git node npm nvm osx web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions)
+fpath=($HOME/.asdf/completions $fpath)
+plugins=(bundler git node npm nvm osx web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf asdf)
 
 source $ZSH/oh-my-zsh.sh
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
