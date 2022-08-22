@@ -14,7 +14,6 @@ export ANDROID_HOME="$HOME/Library/Android/sdk"
 export ANDROID_PATHS=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
 
 # JS dev tools
-export YARN_BIN="$HOME/.yarn/bin"
 export CWD_NODE_MODULES_BIN="./node_modules/.bin"
 
 # Git Fuzzy
@@ -27,4 +26,4 @@ export GPG_TTY=$(tty)
 # export POSTGRES_BIN=/usr/local/opt/libpq/bin
 # export COUCHBASE_BIN=/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin
 
-export PATH=$PATH:$LOCAL_BIN:$COUCHBASE_BIN:$VULKAN_SDK_BIN:$ANDROID_PATHS:$CWD_NODE_MODULES_BIN:$YARN_BIN:$GIT_FUZZY_BIN:$LOCAL_SBIN
+export PATH=$PATH:$LOCAL_BIN:$COUCHBASE_BIN:$VULKAN_SDK_BIN:$ANDROID_PATHS:$CWD_NODE_MODULES_BIN:$GIT_FUZZY_BIN:$LOCAL_SBIN

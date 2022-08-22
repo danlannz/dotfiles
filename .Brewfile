@@ -41,6 +41,7 @@ brew "openssl@1.1" # OpenSSL
 brew "overmind" # Process manager for Procfile-based applications and tmux
 brew "pinentry-mac"  # Pinentry for GPG on Mac
 brew "poppler" # PDF utilities
+brew "postgres" # PostgreSQL database
 brew "pygments" # generic syntax highlighter
 brew "protobuf" # Protocol buffers (Google's data interchange format)
 brew "ripgrep" # (rg) Search tool like grep and The Silver Searcher
@@ -79,7 +80,6 @@ cask "iterm2"
 # cask "orka"
 cask "ngrok"
 cask "plex-media-server"
-cask "postgres"
 cask "postman"
 cask "react-native-debugger"
 # cask "sizeup" # compare with divvy and hyperdock
@@ -93,7 +93,6 @@ cask "spotify"
 cask "the-unarchiver"
 cask "tableplus"
 cask "transmission"
-cask "typora"
 # cask "vagrant"
 cask "virtualbox"
 cask "visual-studio-code"
@@ -105,7 +104,6 @@ cask "zoom"
 
 # mas "1Blocker", id: 1107421413
 # mas "1Password 7", id: 1333542190
-# mas "Airmail 4", id: 918858936
 mas "Amphetamine", id: 937984704
 mas "Harvest", id: 506189836
 # mas "Pixelmator Pro", id: 1289583905

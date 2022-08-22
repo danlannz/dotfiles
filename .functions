@@ -10,7 +10,7 @@ gcob() {
   branches=$(git --no-pager branch -vv) || return
   target=$(
     (echo "$branches") |
-    fzf --height 50% --no-hscroll --no-multi -n 1 \
+    fzf --height 50% --no-hscroll --no-multi -n 1 --query "$1" \
         --ansi --preview="git --no-pager log -150 --pretty=format:%s '..{2}'") || return
   git checkout $(echo "$target" | awk '{print $1}' | sed "s/.* //")
 }
@@ -26,7 +26,7 @@ gcobr() {
     git --no-pager tag | awk '{print "\x1b[35;1mtag\x1b[m\t" $1}') || return
   target=$(
     (echo "$branches"; echo "$tags") |
-    fzf --height 50% --no-hscroll --no-multi -n 2 \
+    fzf --height 50% --no-hscroll --no-multi -n 2 --query "$1" \
         --ansi --preview="git --no-pager log -150 --pretty=format:%s '..{2}'") || return
   git checkout $(awk '{print $2}' <<<"$target" | sed 's/origin\///')
 }

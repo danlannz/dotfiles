@@ -51,7 +51,7 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 fpath=($HOME/.asdf/completions $fpath)
-plugins=(bundler git node npm nvm osx web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf asdf)
+plugins=(bundler git node npm nvm macos web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf doctl)
 
 source $ZSH/oh-my-zsh.sh
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
