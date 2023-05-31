@@ -2,6 +2,9 @@
 export LOCAL_BIN="/usr/local/bin"
 export LOCAL_SBIN="/usr/local/sbin"
 
+# pnpm
+export PNPM_HOME="/Users/daniel/Library/pnpm"
+
 # Vulkan SDK
 export VULKAN_SDK=$HOME/vulkan_sdk/macOS
 export VULKAN_SDK_BIN=$VULKAN_SDK/bin
@@ -10,11 +13,14 @@ export VK_ICD_FILENAMES=$VULKAN_SDK/etc/vulkan/icd.d/MoltenVK_icd.json
 export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
 
 # Android CLI tools
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export ANDROID_PATHS=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk/"
+export ANDROID_TOOLS=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
 
 # JS dev tools
 export CWD_NODE_MODULES_BIN="./node_modules/.bin"
+
+# Go
+export GOPATH=$HOME/go
 
 # Git Fuzzy
 export GIT_FUZZY_BIN="$HOME/.oh-my-zsh/custom/plugins/git-fuzzy/bin"
@@ -26,4 +32,4 @@ export GPG_TTY=$(tty)
 # export POSTGRES_BIN=/usr/local/opt/libpq/bin
 # export COUCHBASE_BIN=/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin
 
-export PATH=$PATH:$LOCAL_BIN:$COUCHBASE_BIN:$VULKAN_SDK_BIN:$ANDROID_PATHS:$CWD_NODE_MODULES_BIN:$GIT_FUZZY_BIN:$LOCAL_SBIN
+export PATH=$PATH:$LOCAL_BIN:$VULKAN_SDK_BIN:$ANDROID_TOOLS:$CWD_NODE_MODULES_BIN:$GOPATH:$GIT_FUZZY_BIN:$LOCAL_SBIN:$PNPM_HOME

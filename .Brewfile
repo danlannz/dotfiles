@@ -6,6 +6,7 @@ tap "homebrew/services"
 tap "heroku/brew"
 
 brew "ack" # grep for devs
+brew "asdf" # version manager for multiple runtimes
 brew "automake" # autogen makefile
 brew "awscli" # cli for Amazon Web Services
 brew "bat" # better cat with syntax highlighting
@@ -45,7 +46,6 @@ brew "postgres" # PostgreSQL database
 brew "pygments" # generic syntax highlighter
 brew "protobuf" # Protocol buffers (Google's data interchange format)
 brew "ripgrep" # (rg) Search tool like grep and The Silver Searcher
-brew "rbenv" # ruby version and environment manager
 brew "ruby-build" # install various versions of ruby
 brew "shellcheck" # static analtsis and lint toold for (ba)sh scripts
 brew "socat" # socket cat (netcat on roids)
