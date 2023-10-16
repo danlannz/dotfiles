@@ -2,6 +2,8 @@
 export LOCAL_BIN="/usr/local/bin"
 export LOCAL_SBIN="/usr/local/sbin"
 
+export DOT_LOCAL="/Users/daniel/.local/bin"
+
 # pnpm
 export PNPM_HOME="/Users/daniel/Library/pnpm"
 
@@ -29,7 +31,9 @@ export GIT_FUZZY_BIN="$HOME/.oh-my-zsh/custom/plugins/git-fuzzy/bin"
 export GPG_TTY=$(tty)
 
 # Database CLI tools
+export LIB_PQ="/opt/homebrew/opt/libpq/bin"
+
 # export POSTGRES_BIN=/usr/local/opt/libpq/bin
 # export COUCHBASE_BIN=/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin
 
-export PATH=$PATH:$LOCAL_BIN:$VULKAN_SDK_BIN:$ANDROID_TOOLS:$CWD_NODE_MODULES_BIN:$GOPATH:$GIT_FUZZY_BIN:$LOCAL_SBIN:$PNPM_HOME
+export PATH=$PATH:$LOCAL_BIN:$DOT_LOCAL:$VULKAN_SDK_BIN:$ANDROID_TOOLS:$CWD_NODE_MODULES_BIN:$GOPATH:$GIT_FUZZY_BIN:$LIB_PQ:$LOCAL_SBIN:$PNPM_HOME
