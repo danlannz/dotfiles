@@ -86,3 +86,11 @@ source $ZSH/oh-my-zsh.sh
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 export REACT_EDITOR=code
+
+# bun completions
+[ -s "/Users/daniel/.bun/_bun" ] && source "/Users/daniel/.bun/_bun"
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/daniel/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
