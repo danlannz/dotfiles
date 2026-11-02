@@ -30,5 +30,13 @@ mackup restore
 
 # Install latest node LTS via NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # load nvm
-nvm install --lts --latest-npm
+NVM_SCRIPT="$(brew --prefix nvm)/nvm.sh"
+[ -s "$NVM_SCRIPT" ] && . "$NVM_SCRIPT" # Intel and Apple Silicon Homebrew
+nvm install --lts --latest-npm || exit 1
+nvm use --lts || exit 1
+
+# Install Bun if needed, then link agent config, restore missing skills, and validate.
+if ! command -v bun >/dev/null 2>&1; then
+  brew install oven-sh/bun/bun || exit 1
+fi
+bun "$HOME/.dotfiles/agents/setup.ts" || exit 1
