@@ -8,6 +8,8 @@ const CLI_VERSION = '1.7.4';
 const directory = dirname(fileURLToPath(import.meta.url));
 const skills = join(directory, 'skills');
 const lock = join(directory, '.skill-lock.json');
+const instructions = join(directory, 'instructions.md');
+const piAgentDirectory = process.env.PI_CODING_AGENT_DIR || join(homedir(), '.pi', 'agent');
 const globalLock = process.env.XDG_STATE_HOME
   ? join(process.env.XDG_STATE_HOME, 'skills', '.skill-lock.json')
   : join(homedir(), '.agents', '.skill-lock.json');
@@ -15,6 +17,9 @@ const links = [
   { source: skills, destination: join(homedir(), '.agents', 'skills') },
   { source: skills, destination: join(homedir(), '.claude', 'skills') },
   { source: lock, destination: globalLock },
+  { source: instructions, destination: join(piAgentDirectory, 'AGENTS.md') },
+  // Unconditional Claude rules preserve existing CLAUDE.md imports and local settings.
+  { source: instructions, destination: join(homedir(), '.claude', 'rules', 'dotfiles.md') },
 ];
 
 type Entries = Record<string, Record<string, unknown>>;
@@ -115,6 +120,7 @@ try {
   const args = Bun.argv.slice(2);
   if (args.some(arg => arg !== '--dry-run')) throw new Error('Usage: bun agents/setup.ts [--dry-run]');
   const dryRun = args.includes('--dry-run');
+  if (!readFileSync(instructions, 'utf8').trim()) throw new Error('Shared instructions.md must not be empty.');
   const entries = readEntries(lock);
   const initial = inspectCollection(skills, entries);
   // Snapshot all restore commands before any CLI invocation can rewrite the shared lockfile.
@@ -146,7 +152,7 @@ try {
     }
     const final = inspectCollection(join(homedir(), '.agents', 'skills'), finalEntries);
     if (final.missing.length) throw new Error(`Restore did not provide skills: ${final.missing.join(', ')}`);
-    console.log('Verified all 3 global links and the linked skill collection (structure only; upstream hashes not checked).');
+    console.log(`Verified all ${links.length} global links and the linked skill collection (structure only; upstream hashes not checked).`);
   }
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

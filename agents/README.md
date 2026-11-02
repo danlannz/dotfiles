@@ -10,6 +10,7 @@ agents/
     tdd/                   # Downloaded, ignored by Git
     local-my-workflow/     # Custom, tracked in Git
   .skill-lock.json         # Native Skills CLI global metadata, tracked
+  instructions.md          # Shared personal defaults and workflow policy
   setup.ts
   setup.test.ts
 ```
@@ -20,9 +21,21 @@ The home directories share this collection through whole-directory symlinks:
 ~/.agents/skills           -> ~/.dotfiles/agents/skills
 ~/.claude/skills           -> ~/.dotfiles/agents/skills
 ~/.agents/.skill-lock.json -> ~/.dotfiles/agents/.skill-lock.json
+~/.pi/agent/AGENTS.md      -> ~/.dotfiles/agents/instructions.md
+~/.claude/rules/dotfiles.md -> ~/.dotfiles/agents/instructions.md
 ```
 
 If `XDG_STATE_HOME` is set, the lockfile link goes under `$XDG_STATE_HOME/skills/` instead. Skill directory links remain as shown above.
+
+## Personal instructions
+
+Edit `instructions.md` to tune shared development and communication defaults. It prefers Bun/TypeScript for new tooling, native configuration formats, focused changes, explicit approval for commits/pushes, and evidence-backed verification. Project conventions and explicit requests take precedence over these defaults.
+
+The workflow policy makes Matt Pocock the primary toolkit, Superpowers supplementary guardrails, and `caveman`/`i-have-adhd` opt-in communication modes. No model, permission, or MCP settings are changed.
+
+Pi reads this through its global `AGENTS.md`; `PI_CODING_AGENT_DIR` overrides the default `~/.pi/agent` destination. Claude reads it as an unconditional user-level rule, leaving existing `~/.claude/CLAUDE.md` imports (including RTK) and unrelated rules untouched. Existing conflicting files at the managed destinations are backed up. A Pi `AGENTS.override.md` in the same directory takes precedence over `AGENTS.md` and needs separate review if present.
+
+Run `/reload` in Pi or start a new Claude session after editing. For discovery details, see [Pi configuration](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md) and [Claude memory/rules](https://code.claude.com/docs/en/memory).
 
 ## New device
 

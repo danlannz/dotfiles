@@ -23,6 +23,7 @@ beforeEach(() => {
     skillPath: 'skills/upstream/SKILL.md',
   } } }));
   copyFileSync(fileURLToPath(new URL('./setup.ts', import.meta.url)), installer);
+  writeFileSync(join(dirname(installer), 'instructions.md'), '# Personal defaults\nPrefer Bun and TypeScript.\n');
   // Fake the CLI, never the setup logic: test downloads without network or real-home writes.
   const bin = join(directory, 'bin');
   mkdirSync(bin);
@@ -47,7 +48,7 @@ function run(args: string[] = [], env: Record<string, string> = {}) {
   return Bun.spawnSync([process.execPath, installer, ...args], {
     cwd: directory,
     env: {
-      ...process.env, HOME: home, XDG_STATE_HOME: '',
+      ...process.env, HOME: home, XDG_STATE_HOME: '', PI_CODING_AGENT_DIR: '',
       BUN_RUNTIME_TRANSPILER_CACHE_PATH: join(directory, 'bun-cache'),
       PATH: `${join(directory, 'bin')}:${process.env.PATH}`,
       CALL_LOG: join(directory, 'calls'), TEST_LOCK: lock, ...env,
@@ -59,13 +60,16 @@ function run(args: string[] = [], env: Record<string, string> = {}) {
 test('links both whole skill directories and verifies the collection from another cwd', () => {
   const result = run();
   expect(result.exitCode).toBe(0);
-  expect(result.stdout.toString()).toContain('Verified all 3 global links and the linked skill collection');
+  expect(result.stdout.toString()).toContain('Verified all 5 global links and the linked skill collection');
   for (const agent of ['.agents', '.claude']) {
     const path = join(home, agent, 'skills');
     expect(lstatSync(path).isSymbolicLink()).toBe(true);
     expect(realpathSync(path)).toBe(installed);
   }
   expect(realpathSync(join(home, '.agents', '.skill-lock.json'))).toBe(lock);
+  const instructions = join(dirname(installer), 'instructions.md');
+  expect(realpathSync(join(home, '.pi', 'agent', 'AGENTS.md'))).toBe(instructions);
+  expect(realpathSync(join(home, '.claude', 'rules', 'dotfiles.md'))).toBe(instructions);
 });
 
 test('custom skills created through either agent path are automatically shared and vendored', () => {
@@ -99,7 +103,9 @@ test('repeated runs keep the correct links without extra backups', () => {
   expect(run().exitCode).toBe(0);
   expect(run().exitCode).toBe(0);
   expect(readdirSync(join(home, '.agents')).sort()).toEqual(['.skill-lock.json', 'skills']);
-  expect(readdirSync(join(home, '.claude'))).toEqual(['skills']);
+  expect(readdirSync(join(home, '.claude')).sort()).toEqual(['rules', 'skills']);
+  expect(readdirSync(join(home, '.pi', 'agent'))).toEqual(['AGENTS.md']);
+  expect(readdirSync(join(home, '.claude', 'rules'))).toEqual(['dotfiles.md']);
 });
 
 test('backs up dangling symlinks before replacing them', () => {
@@ -118,10 +124,10 @@ test('honors XDG_STATE_HOME for the lock but not skill discovery directories', (
   expect(realpathSync(join(home, '.agents', 'skills'))).toBe(installed);
 });
 
-test('dry-run describes three links without writing anything', () => {
+test('dry-run describes five links without writing anything', () => {
   const result = run(['--dry-run']);
   expect(result.exitCode).toBe(0);
-  expect(result.stdout.toString().match(/Would link/g)).toHaveLength(3);
+  expect(result.stdout.toString().match(/Would link/g)).toHaveLength(5);
   expect(existsSync(home)).toBe(false);
 });
 
@@ -295,4 +301,44 @@ test('gitignore excludes downloads but includes local- skills and nested resourc
   expect(ignored('agents/skills/local-personal/SKILL.md')).toBe(1);
   expect(ignored('agents/skills/local-personal/resources/helper.ts')).toBe(1);
   expect(ignored('agents/.skill-lock.json')).toBe(1);
+});
+
+test('preserves existing Claude instructions, imports, and unrelated rules', () => {
+  mkdirSync(join(home, '.claude', 'rules'), { recursive: true });
+  writeFileSync(join(home, '.claude', 'CLAUDE.md'), '@RTK.md\n');
+  writeFileSync(join(home, '.claude', 'RTK.md'), '# Existing RTK config');
+  writeFileSync(join(home, '.claude', 'rules', 'other.md'), '# Other preferences');
+  expect(run().exitCode).toBe(0);
+  expect(readFileSync(join(home, '.claude', 'CLAUDE.md'), 'utf8')).toBe('@RTK.md\n');
+  expect(readFileSync(join(home, '.claude', 'RTK.md'), 'utf8')).toBe('# Existing RTK config');
+  expect(readFileSync(join(home, '.claude', 'rules', 'other.md'), 'utf8')).toBe('# Other preferences');
+});
+
+test('backs up conflicting global instruction files before linking shared defaults', () => {
+  const targets = [join(home, '.pi', 'agent', 'AGENTS.md'), join(home, '.claude', 'rules', 'dotfiles.md')];
+  for (const target of targets) {
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, '# Previous instructions');
+  }
+  expect(run().exitCode).toBe(0);
+  for (const target of targets) {
+    expect(lstatSync(target).isSymbolicLink()).toBe(true);
+    const backup = readdirSync(dirname(target)).find(name => name.startsWith(target.split('/').at(-1)! + '.backup-'))!;
+    expect(readFileSync(join(dirname(target), backup), 'utf8')).toBe('# Previous instructions');
+  }
+});
+
+test('honors the Pi agent directory override for personal instructions', () => {
+  const piDirectory = join(directory, 'custom-pi');
+  expect(run([], { PI_CODING_AGENT_DIR: piDirectory }).exitCode).toBe(0);
+  expect(realpathSync(join(piDirectory, 'AGENTS.md'))).toBe(join(dirname(installer), 'instructions.md'));
+  expect(existsSync(join(home, '.pi'))).toBe(false);
+});
+
+test.each(['', '   \n', null])('missing or empty shared instructions fail before changing home', content => {
+  const path = join(dirname(installer), 'instructions.md');
+  if (content === null) rmSync(path);
+  else writeFileSync(path, content);
+  expect(run().exitCode).toBe(1);
+  expect(existsSync(home)).toBe(false);
 });
