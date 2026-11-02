@@ -7,6 +7,7 @@ set -e
 
 [[ "$1" = "--debug" || -o xtrace ]] && DEBUG="1"
 SUCCESS=""
+HOMEBREW_INSTALLER=""
 
 sudo_askpass() {
   if [ -n "$SUDO_ASKPASS" ]; then
@@ -18,7 +19,7 @@ sudo_askpass() {
 
 cleanup() {
   set +e
-  sudo_askpass rm -rf "$CLT_PLACEHOLDER" "$SUDO_ASKPASS" "$SUDO_ASKPASS_DIR"
+  sudo_askpass rm -rf "$CLT_PLACEHOLDER" "$SUDO_ASKPASS" "$SUDO_ASKPASS_DIR" "$HOMEBREW_INSTALLER"
   sudo --reset-timestamp
   if [ -z "$SUCCESS" ]; then
     if [ -n "$STEP" ]; then
@@ -268,43 +269,37 @@ then
 fi
 logk
 
-# Setup Homebrew directory and permissions.
-logn "Installing Homebrew:"
-HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
-[ -n "$HOMEBREW_PREFIX" ] || HOMEBREW_PREFIX="/usr/local"
-[ -d "$HOMEBREW_PREFIX" ] || sudo_askpass mkdir -p "$HOMEBREW_PREFIX"
-if [ "$HOMEBREW_PREFIX" = "/usr/local" ]
-then
-  sudo_askpass chown "root:wheel" "$HOMEBREW_PREFIX" 2>/dev/null || true
+# Select the native prefix before looking for brew; an Intel installation on an
+# Apple Silicon Mac must not determine where the native installation belongs.
+case "$(uname -m)" in
+  arm64) HOMEBREW_PREFIX="/opt/homebrew" ;;
+  x86_64) HOMEBREW_PREFIX="/usr/local" ;;
+  *) abort "Unsupported architecture for Homebrew: $(uname -m)" ;;
+esac
+export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+
+# Let Homebrew's maintained installer own its layout and permissions. Never
+# reinitialise or hard-reset an existing installation during dotfile setup.
+if ! [ -x "$HOMEBREW_PREFIX/bin/brew" ]; then
+  logn "Installing Homebrew:"
+  HOMEBREW_INSTALLER="$(mktemp "${TMPDIR:-/tmp}/dotfiles-homebrew-install.XXXXXX")"
+  if ! curl --fail --show-error --location \
+      https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh \
+      --output "$HOMEBREW_INSTALLER"; then
+    abort "Could not download the official Homebrew installer."
+  fi
+  if ! /bin/bash "$HOMEBREW_INSTALLER"; then
+    abort "The official Homebrew installer failed."
+  fi
+  if ! [ -x "$HOMEBREW_PREFIX/bin/brew" ]; then
+    abort "Homebrew installer did not provide $HOMEBREW_PREFIX/bin/brew."
+  fi
+  rm -f "$HOMEBREW_INSTALLER"
+  HOMEBREW_INSTALLER=""
+  logk
 fi
-(
-  cd "$HOMEBREW_PREFIX"
-  sudo_askpass mkdir -p               Cellar Frameworks bin etc include lib opt sbin share var
-  sudo_askpass chown -R "$USER:admin" Cellar Frameworks bin etc include lib opt sbin share var
-)
-
-HOMEBREW_REPOSITORY="$(brew --repository 2>/dev/null || true)"
-[ -n "$HOMEBREW_REPOSITORY" ] || HOMEBREW_REPOSITORY="/usr/local/Homebrew"
-[ -d "$HOMEBREW_REPOSITORY" ] || sudo_askpass mkdir -p "$HOMEBREW_REPOSITORY"
-sudo_askpass chown -R "$USER:admin" "$HOMEBREW_REPOSITORY"
-
-if [ $HOMEBREW_PREFIX != $HOMEBREW_REPOSITORY ]
-then
-  ln -sf "$HOMEBREW_REPOSITORY/bin/brew" "$HOMEBREW_PREFIX/bin/brew"
-fi
-
-# Download Homebrew.
-export GIT_DIR="$HOMEBREW_REPOSITORY/.git" GIT_WORK_TREE="$HOMEBREW_REPOSITORY"
-git init $Q
-git config remote.origin.url "https://github.com/Homebrew/brew"
-git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-git fetch $Q --tags --force
-git reset $Q --hard origin/master
-unset GIT_DIR GIT_WORK_TREE
-logk
 
 # Update Homebrew.
-export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 log "Updating Homebrew:"
 brew update
 logk
