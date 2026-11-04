@@ -1,0 +1,21 @@
+#!/bin/bash
+# Retry only App Store apps, without running bootstrap or its setup hooks.
+set -euo pipefail
+
+if [ "$#" -ne 0 ]; then
+  echo "Usage: $0" >&2
+  exit 2
+fi
+
+BREWFILE="$(cd "$(dirname "$0")/.." && pwd)/Brewfile.app-store"
+if ! command -v brew >/dev/null 2>&1; then
+  echo "Homebrew is required. Run bootstrap first." >&2
+  exit 1
+fi
+
+echo "App Store setup: sign in through the App Store before continuing."
+if brew bundle check --file "$BREWFILE" --no-upgrade; then
+  echo "App Store apps are already installed; nothing to do."
+else
+  brew bundle install --file "$BREWFILE" --no-upgrade
+fi

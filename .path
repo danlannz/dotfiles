@@ -2,13 +2,13 @@
 export LOCAL_BIN="/usr/local/bin"
 export LOCAL_SBIN="/usr/local/sbin"
 
-export DOT_LOCAL="/Users/daniel/.local/bin"
+export DOT_LOCAL="$HOME/.local/bin"
 
 # pnpm
-export PNPM_HOME="/Users/daniel/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 
 # bun
-export BUN_BIN="/Users/daniel/.bun/bin"
+export BUN_BIN="$HOME/.bun/bin"
 
 # Vulkan SDK
 export VULKAN_SDK=$HOME/vulkan_sdk/macOS

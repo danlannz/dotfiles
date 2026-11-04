@@ -1,0 +1,11 @@
+# Optional App Store stage: sign in through App Store, then run script/setup-app-store.
+
+# mas "1Password 7", id: 1333542190                              # OPTIONAL: legacy-generation password manager; confirm the intended version.
+mas "Amphetamine", id: 937984704                                 # Keep the Mac awake
+mas "Harvest", id: 506189836                                     # Time tracking
+# mas "Pixelmator Pro", id: 1289583905                           # OPTIONAL: image editor
+mas "Slack", id: 803453959                                       # Team messaging
+# NOTE: the current App Store Xcode (27.2) needs macOS 26.6+; obtain a compatible release manually on older hosts.
+if OS.mac? && MacOS.version >= "26.6"
+  mas "Xcode", id: 497799835                                     # Apple's IDE, SDKs, and developer tools
+end

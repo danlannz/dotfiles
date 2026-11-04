@@ -1,7 +1,7 @@
 alias dircolors=gdircolors
 
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/Daniel/.oh-my-zsh
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -53,7 +53,7 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 fpath=($HOME/.asdf/completions $fpath)
 plugins=(bundler git node npm nvm macos web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf doctl asdf)
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
 # User configuration
 
@@ -88,9 +88,9 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 export REACT_EDITOR=code
 
 # bun completions
-[ -s "/Users/daniel/.bun/_bun" ] && source "/Users/daniel/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/daniel/.docker/completions $fpath)
+fpath=("$HOME/.docker/completions" $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions

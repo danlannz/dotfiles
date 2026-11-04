@@ -1,11 +1,19 @@
 #!/bin/sh
 
 # based on this https://github.com/mikemcquaid/strap
-#/ Usage: bin/bootstrap.sh [--debug]
+#/ Usage: bootstrap.sh [--debug] [--app-store]
 #/ Install development dependencies on macOS.
 set -e
 
-[[ "$1" = "--debug" || -o xtrace ]] && DEBUG="1"
+INSTALL_APP_STORE=""
+for argument in "$@"; do
+  case "$argument" in
+    --debug) DEBUG="1" ;;
+    --app-store) INSTALL_APP_STORE="1" ;;
+    *) echo "Unknown option: $argument. Usage: $0 [--debug] [--app-store]" >&2; exit 2 ;;
+  esac
+done
+[[ -o xtrace ]] && DEBUG="1"
 SUCCESS=""
 HOMEBREW_INSTALLER=""
 
@@ -304,14 +312,8 @@ log "Updating Homebrew:"
 brew update
 logk
 
-# Install Homebrew Bundle, Cask and Services tap.
-log "Installing Homebrew taps and extensions:"
-brew bundle --file=- <<RUBY
-tap 'homebrew/cask'
-tap 'homebrew/core'
-tap 'homebrew/services'
-RUBY
-logk
+# Bundle and services are built into Homebrew. Application-specific taps belong
+# in .Brewfile; explicitly tapping homebrew/core or homebrew/cask is unnecessary.
 
 # Check and install any remaining software updates.
 logn "Checking for software updates:"
@@ -375,6 +377,18 @@ if [ -f "$HOME/.Brewfile" ]; then
   log "Installing from user Brewfile on GitHub:"
   brew bundle check --global || brew bundle --global
   logk
+fi
+
+# Account detection is not supported by current mas. Require explicit consent
+# after the user signs in through App Store; the standalone command is resumable.
+if [ -n "$INSTALL_APP_STORE" ]; then
+  APP_STORE_SETUP="$HOME/.dotfiles/script/setup-app-store"
+  [ -x "$APP_STORE_SETUP" ] || abort "Missing $APP_STORE_SETUP; update the dotfiles checkout first."
+  log "Installing App Store apps:"
+  "$APP_STORE_SETUP"
+  logk
+else
+  echo "App Store apps deferred. After signing in, run ~/.dotfiles/script/setup-app-store."
 fi
 
 # Tap a custom Homebrew tap
