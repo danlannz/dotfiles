@@ -8,6 +8,8 @@ Decide the iTerm profile/font requirements now, but avoid building another bespo
 
 Research baseline: **released mise v2026.11.0**, published **2026-11-03**, not just an unreleased proposal. The capabilities below were checked against that tag's official documentation. No mise binary was installed or executed, and no host/VM provisioning was performed for this review. This is a capability/design review, not a claim that a migration has passed our VM tests. [S1]
 
+Follow-up: the [isolated runtime/task pilot](mise-pilot-results.md) now has real VM evidence. It supports proceeding incrementally, but exposed interactive config-trust and raw-exec lockfile-fallback caveats. The original review below remains the capability/design baseline; it is not a claim that later migration phases have been implemented.
+
 ## What we currently have
 
 - `bootstrap.sh`: administrator/security settings, FileVault/CI handling, CLT and native Homebrew installation, Git setup, checkout/linking, package installation, App Store opt-in, and post-install dispatch.

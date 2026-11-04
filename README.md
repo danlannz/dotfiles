@@ -44,3 +44,5 @@ See [agents/README.md](agents/README.md) for the shared Pi/Claude Code configura
 The [living backlog](docs/modernisation-backlog.md) tracks the original audit, completed fixes, remaining safety/UX work and the mise adoption sequence. Original VS Code, credential-management and macOS-defaults TODOs are retained there.
 
 See the [original audit](docs/dotfiles-audit.md), [mise fit review](docs/mise-fit-review.md), and [VM results](docs/utm-bootstrap-results.md) for evidence and limits.
+
+The [isolated mise pilot](mise/pilot/README.md) and its [results](docs/mise-pilot-results.md) cover the first Node/Bun/task experiment. It is not global configuration and does not change the default bootstrap or retire existing runtime managers.

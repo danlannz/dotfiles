@@ -5,8 +5,8 @@ This is the living backlog. Keep it current as ownership moves to mise; adopting
 ## Current checkpoint
 
 - Native ARM Homebrew bootstrap is committed in `249635a`.
-- The cleanup checkpoint includes reviewed/annotated Brewfiles, explicit App Store setup, non-interactive/config-preserving Oh My Zsh installation, missing-plugin repair, home-relative shell paths, and interactive Agnoster startup fixes.
-- **69 tests passed on host and guest** before the mise pilot. Native base-package checks and interactive prompt probes have passed in the guest.
+- The cleanup checkpoint is committed as `d7d76e2` and includes reviewed/annotated Brewfiles, explicit App Store setup, non-interactive/config-preserving Oh My Zsh installation, missing-plugin repair, home-relative shell paths, and interactive Agnoster startup fixes.
+- **69 tests passed on host and guest** before the mise pilot. The isolated pilot adds two opt-in real-CLI tests: **71 pass under mise in the guest**; normal host runs retain 69 tests plus two skipped integration cases. Native base-package checks and interactive prompt probes have also passed. See [mise pilot results](mise-pilot-results.md).
 - Full provisioning is **not** an end-to-end pass: Homebrew update/connectivity stalled separate runs, and Mackup reports missing iCloud Drive while the existing hook ignores its failure.
 - iTerm still needs an intentional version-controlled font/profile/default-selection setup; installing a font alone did not provide that.
 - The user's test VM may be running. Do not stop or replace it without checking; the clean baseline is protected. Test provisioning only in disposable guests, never the host.
@@ -14,7 +14,7 @@ This is the living backlog. Keep it current as ownership moves to mise; adopting
 ## Agreed implementation order
 
 1. Preserve this checkpoint and the existing evidence/tests.
-2. **Mise pilot:** Node/Bun and named verification tasks, isolated to the VM. No host activation, runtime removal, package-provider switch, or agent-module rewrite.
+2. **Mise pilot (verified):** Node/Bun and named verification tasks, isolated to the VM. No host activation, runtime removal, package-provider switch, or agent-module rewrite. Complete project-version/npm policy and activation integration checks before any default cutover.
 3. **Safe deployment and terminal setup:** replace the unsafe generic linker with explicit native mise dotfile declarations; deploy a native iTerm profile and its selected font without destroying custom profiles.
 4. **Orchestration:** move appropriate repositories, user defaults and stages into mise; remove replaced script sections. Keep account/cloud actions explicit and independently resumable.
 5. **Optional package-provider evaluation:** retain Brewfiles as authority initially; only migrate packages to mise's native installers after ownership/compatibility tests justify it.
@@ -29,7 +29,7 @@ No automatic push, broad cleanup, force-replacement, VM deletion, or removal of 
 | M01 | High | Replace `script/setup`'s broad hidden-file loop and destructive `rm`. Explicit targets; absent/correct/wrong/broken links; real-file/directory conflicts; paths with spaces; dry run; safe repeat. | **Open.** Prefer native mise symlink deployment over writing a custom linker. Refuse conflicts by default; no blanket `--force`. Existing real files must survive. |
 | M02 | High | Required stages must report failure; keep stderr visible; distinguish skipped optional work from success. | **Partial.** Shell download/installer/plugin errors now stop the hook and its undefined logger dependency is removed. Mackup/font failures and bootstrap stderr suppression still need policy/fixes. Mise cannot detect failures swallowed inside scripts. |
 | M03 | High | Make settings restoration optional, scoped and independently rerunnable; define Mackup's ownership versus repo-owned settings. | **Open.** Missing iCloud must not block a usable terminal or masquerade as a successful restore. No real Apple credentials in test VMs. Keep default mise setup free of cloud dependencies. |
-| M04 | High | Consolidate developer runtime ownership and make scripts work without interactive activation. | **Next: VM pilot.** Start Node/Bun, explicit versions/lockfile, `mise exec`/tasks. Verify `node`, `npm`, `bun`, `bunx` and agent setup. Inventory other projects before retiring NVM/asdf; remove conflicting activation only at a verified cutover. Retain old installs for rollback. |
+| M04 | High | Consolidate developer runtime ownership and make scripts work without interactive activation. | **Partial: isolated pilot verified.** Node/Bun, native lockfile, strict install, task verification, executable provenance, Bunx/agent restoration and private interactive activation pass. Global/default cutover remains open. Decide bundled npm versus a separate pin; inventory other projects before retiring NVM/asdf. Retain old installs for rollback. |
 | M05 | High | Make iTerm/font/prompt configuration usable out of the box on a new user account. | **Open.** Use native profile JSON and a maintained font cask, independent of iCloud. Choose font/size/palette, preserve custom profiles, choose defaults safely on fresh installs, test restart/reload and actual glyphs. Host baseline is Meslo Nerd Font 12 pt/dark; final desired baseline remains undecided. |
 | M06 | High | Keep provisioning responsibilities small and explicit instead of a stale, growing Strap fork. | **Partial.** Official native Homebrew installer is used. Mise can take tools/dotfiles/repos/user defaults/stage orchestration; retain a small prerequisite/OS entry point. Avoid a cycle in which a mise task needs to install mise itself. |
 | M07 | High for rollout | Choose/publish the shared baseline and test the exact documented remote bootstrap. | **Open.** README's remote `master` does not contain this local cleanup work. Commit/review/merge/push only when authorised. A VM run of a local bundle is not a test of the published command. |
@@ -56,6 +56,7 @@ No automatic push, broad cleanup, force-replacement, VM deletion, or removal of 
 | C06 | Shell framework and selected user-tool paths use HOME; actual interactive Agnoster loading verified. | `.zshrc`/`.path` regressions and native PTY prompt probes. Terminal font/profile appearance remains M05. |
 | C07 | Shared agent configuration/collection with native lockfile, whole-directory links, custom `local-*` ownership, restoration/backups/validation. | Preserve `agents/setup.ts`, its 36 tests and native verification. Mise's tool-bundled skills feature is not a replacement for this curated collection. |
 | C08 | Disposable macOS test baseline, diagnostic clones and provenance-aware results. | [Procedure](utm-bootstrap-testing.md), [results](utm-bootstrap-results.md). No host-home sharing or real account credentials; do not confuse stage tests with a full success. |
+| C09 | Mise runtime/task pilot in a separate guest checkout and HOME/config/data/state. | [Pilot results](mise-pilot-results.md), [native config/commands](../mise/pilot/README.md). Node/Bun provenance and 71 tests pass; no host activation, runtime removal or package-provider switch. |
 
 ## Mise pilot acceptance gates
 
@@ -67,3 +68,5 @@ No automatic push, broad cleanup, force-replacement, VM deletion, or removal of 
 - Keep the host and the user's live VM configuration unchanged; any guest mise config/data/cache is explicitly isolated.
 - Record runtime provenance, limits, commands and results before a host/default-activation cutover.
 - Do not mark later items complete just because mise offers a capability; validate their behaviour here.
+
+Pilot findings: explicitly trust the final reviewed config before interactive activation. Do not use a raw `mise exec` as proof of strict locking: the observed missing-lock fallback requires an explicit `mise install --locked` preflight plus executable-provenance checks. These are recorded constraints, not permission to bypass trust/checksums.
