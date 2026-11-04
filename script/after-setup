@@ -2,6 +2,7 @@
 
 log()   { STEP="$*"; echo "--> $*"; }
 logk()  { STEP="";   echo "OK"; }
+ROOT="$(cd "$(dirname "$0")/.." && pwd -P)" || exit 1
 
 # Preserve the repo's shell configuration and keep installation non-interactive.
 export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
@@ -40,18 +41,10 @@ if [ ! -f "$HOME/Library/Fonts/Meslo LG M Regular for Powerline.ttf" ]; then
   logk
 fi
 
-# Restore Mackup configs
-mackup restore
+# Cloud restoration can overwrite deployed shell/app settings. It is a separate
+# account-dependent operation, not an unconditional part of a safe install.
+printf 'Cloud settings deferred. After signing in and reviewing the backup, run mise -C "%s" run restore-settings.\n' "$ROOT"
 
-# Install latest node LTS via NVM
-export NVM_DIR="$HOME/.nvm"
-NVM_SCRIPT="$(brew --prefix nvm)/nvm.sh"
-[ -s "$NVM_SCRIPT" ] && . "$NVM_SCRIPT" # Intel and Apple Silicon Homebrew
-nvm install --lts --latest-npm || exit 1
-nvm use --lts || exit 1
-
-# Install Bun if needed, then link agent config, restore missing skills, and validate.
-if ! command -v bun >/dev/null 2>&1; then
-  brew install oven-sh/bun/bun || exit 1
-fi
-bun "$HOME/.dotfiles/agents/setup.ts" || exit 1
+# Install locked defaults first, then use their Bun for the existing agent module.
+# Keep this independent of the caller's cwd and interactive shell activation.
+mise -C "$ROOT" run agents || exit "$?"

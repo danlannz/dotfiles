@@ -35,6 +35,13 @@ function git() {
     exit 78
   fi
 }
+function command() {
+  if builtin [ "$1" = -v ] && builtin [ "$2" = mise ]; then
+    builtin [ "$HAVE_MISE" = 1 ] || builtin [ -f "$MISE_MARKER" ]; return
+  fi
+  builtin command "$@"
+}
+function mise() { printf 'mise %s\n' "$*" >> "$TRACE"; }
 function softwareupdate() { printf 'No new software available.\n'; }
 function curl() {
   printf 'curl %s\n' "$*" >> "$TRACE"
@@ -55,6 +62,11 @@ function brew() {
     update)
       printf 'checkpoint prefix=%s path=%s\n' "$HOMEBREW_PREFIX" "$PATH" >> "$TRACE"
       if builtin [ "$STOP_AT_UPDATE" = 1 ]; then exit 77; fi ;;
+    install)
+      if builtin [ "$2" = mise ]; then
+        builtin [ "$MISE_INSTALL_STATUS" = 0 ] || return "$MISE_INSTALL_STATUS"
+        builtin [ "$MISE_NO_BINARY" = 1 ] || touch "$MISE_MARKER"
+      fi ;;
     bundle)
       if builtin [ "$CONTINUE_TO_BUNDLE" = 1 ]; then
         if builtin [ "$3" = --file ]; then
@@ -67,7 +79,7 @@ function brew() {
       return 1 ;;
   esac
 }
-export -f '[' uname groups sudo defaults caffeinate fdesetup chown mkdir ln git curl brew softwareupdate
+export -f '[' uname groups sudo defaults caffeinate fdesetup chown mkdir ln git curl brew softwareupdate command mise
 exec /bin/bash "$BOOTSTRAP_SCRIPT" "$@"
 `;
 
@@ -79,6 +91,7 @@ beforeEach(() => {
   mkdirSync(join(fixtureRepo, 'script'), { recursive: true });
   copyFileSync(fileURLToPath(new URL('../script/setup-app-store', import.meta.url)), join(fixtureRepo, 'script/setup-app-store'));
   copyFileSync(fileURLToPath(new URL('../Brewfile.app-store', import.meta.url)), join(fixtureRepo, 'Brewfile.app-store'));
+  writeFileSync(join(fixtureRepo, 'script/setup'), '#!/bin/bash\ncommand -v mise >/dev/null || exit 91\nprintf "fixture setup\\n" >> "$TRACE"\nprintf "setup diagnostics\\n" >&2\nexit "${SETUP_STATUS:-0}"\n', { mode: 0o755 });
   writeFileSync(join(directory, 'home/.Brewfile'), '# Fixture: package operations are stubbed.\n');
 });
 
@@ -92,6 +105,7 @@ function run(overrides: Record<string, string> = {}, args: string[] = []) {
       HOME: join(directory, 'home'), USER: 'fixture', PATH: '/usr/bin:/bin:/usr/sbin:/sbin',
       CI: '1', TMPDIR: join(directory, 'tmp'), TRACE: join(directory, 'trace'),
       BOOTSTRAP_SCRIPT: bootstrap, FAKE_ARCH: 'arm64', EXISTING_BREW: '', HOMEBREW_PREFIX: '',
+      HAVE_MISE: '1', MISE_INSTALL_STATUS: '0', MISE_NO_BINARY: '0', MISE_MARKER: join(directory, 'mise-installed'),
       DOWNLOAD_STATUS: '0', INSTALL_STATUS: '0', BREW_MARKER: join(directory, 'native-brew-installed'), STOP_AT_UPDATE: '1', CONTINUE_TO_BUNDLE: '0', APP_STORE_CHECK_STATUS: '0', APP_STORE_INSTALL_STATUS: '0', ...overrides,
     },
     stdout: 'pipe', stderr: 'pipe',
@@ -170,6 +184,44 @@ test('Homebrew provisioning reaches the next stage without tapping built-in or r
 });
 
 const completeProvisioning = { STOP_AT_UPDATE: '0', CONTINUE_TO_BUNDLE: '1', EXISTING_BREW: '/opt/homebrew/bin/brew' };
+
+test('bootstrap installs missing mise before deploying an existing local checkout, even when GitHub lookup is unavailable', () => {
+  const result = run({ ...completeProvisioning, HAVE_MISE: '0' });
+  expect(result.exitCode).toBe(0);
+  expect(result.trace).toContain('brew install mise');
+  expect(result.trace).toContain('fixture setup');
+  expect(result.trace.indexOf('brew install mise')).toBeLessThan(result.trace.indexOf('fixture setup'));
+  expect(result.trace.indexOf('fixture setup')).toBeLessThan(result.trace.indexOf('brew bundle'));
+  expect(result.stderr.toString()).toContain('setup diagnostics');
+});
+
+test('an existing mise still goes through the refreshed provider prerequisite before new config is linked', () => {
+  const result = run(completeProvisioning);
+  expect(result.exitCode).toBe(0);
+  expect(result.trace).toContain('brew install mise');
+  expect(result.trace.indexOf('brew install mise')).toBeLessThan(result.trace.indexOf('fixture setup'));
+});
+
+test('failed mise installation stops before deployment or package bundle', () => {
+  const result = run({ ...completeProvisioning, HAVE_MISE: '0', MISE_INSTALL_STATUS: '17' });
+  expect(result.exitCode).toBe(17);
+  expect(result.trace).not.toContain('fixture setup');
+  expect(result.trace).not.toContain('brew bundle');
+});
+
+test('a mise installer returning zero without a binary cannot continue', () => {
+  const result = run({ ...completeProvisioning, HAVE_MISE: '0', MISE_NO_BINARY: '1' });
+  expect(result.exitCode).toBe(1);
+  expect(result.trace).not.toContain('fixture setup');
+});
+
+test('deployment conflicts remain visible and stop before package installation', () => {
+  const result = run({ ...completeProvisioning, SETUP_STATUS: '9' });
+  expect(result.exitCode).toBe(9);
+  expect(result.stderr.toString()).toContain('setup diagnostics');
+  expect(result.trace).not.toContain('brew bundle');
+  expect(result.stdout.toString()).not.toContain("You're good to go");
+});
 
 test('default bootstrap completes without an App Store login and explains how to resume', () => {
   const result = run(completeProvisioning);

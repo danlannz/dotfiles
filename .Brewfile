@@ -1,7 +1,5 @@
 # Reviewed against Homebrew catalogs and the NZ App Store on 2026-11-02.
 
-tap "oven-sh/bun", trusted: { formulae: ["bun"] }                # Official Bun runtime packages; scoped trust only
-
 # Tart's current Homebrew dependency (softnet) requires macOS 26 Tahoe.
 # Skip it on older hosts rather than breaking bundle installation.
 if OS.mac? && Hardware::CPU.arm? && MacOS.version >= :tahoe
@@ -11,7 +9,7 @@ end
 
 brew "ack"                                                       # Programmer-oriented text search
 brew "agent-browser"                                             # Browser automation CLI for AI agents
-brew "asdf"                                                      # Extensible language/runtime version manager
+brew "asdf"                                                      # Legacy Java/Kotlin/Python manager; Node/Bun use mise
 brew "automake"                                                  # Generate GNU-compatible Makefiles
 brew "awscli"                                                    # Amazon Web Services command-line interface
 brew "bat"                                                       # Display files with syntax highlighting and Git integration
@@ -47,12 +45,11 @@ brew "libsodium"                                                 # Networking an
 brew "llm"                                                       # Access language models from the command line
 brew "mackup"                                                    # Back up and restore application settings
 brew "mas"                                                       # Mac App Store command-line interface
+brew "mise"                                                      # Runtime management and explicit dotfile deployment
 brew "mkcert"                                                    # Create locally trusted development certificates
 brew "neovim"                                                    # Extensible terminal text editor
-brew "nvm"                                                       # Manage Node.js versions
 brew "nss"                                                       # Mozilla Network Security Services libraries and tools
 brew "opencode"                                                  # Terminal-based AI coding agent
-brew "oven-sh/bun/bun"                                           # JavaScript/TypeScript runtime, package manager, and bundler
 brew "overmind"                                                  # Run Procfile-based applications using tmux
 brew "pinentry-mac"                                              # Native macOS GPG passphrase prompt
 brew "poppler"                                                   # PDF rendering and inspection utilities
@@ -63,7 +60,6 @@ brew "protobuf"                                                  # Protocol Buff
 brew "railway"                                                   # Railway application deployment CLI
 brew "ripgrep"                                                   # Fast recursive text search
 brew "rtk"                                                       # Reduce token-heavy command output for coding agents
-brew "ruby-build"                                                # Install Ruby versions and implementations
 brew "rust"                                                      # Rust compiler and Cargo package manager
 brew "shellcheck"                                                # Static analysis for shell scripts
 brew "socat"                                                     # Connect and relay between sockets and streams

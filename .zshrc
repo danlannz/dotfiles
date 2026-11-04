@@ -51,7 +51,7 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 fpath=($HOME/.asdf/completions $fpath)
-plugins=(bundler git node npm nvm macos web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf doctl asdf)
+plugins=(bundler git node npm macos web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf doctl asdf)
 
 source "$ZSH/oh-my-zsh.sh"
 
@@ -94,3 +94,9 @@ fpath=("$HOME/.docker/completions" $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
+
+# Mise owns Node/Bun (and project pnpm). Activate after other PATH writers so
+# legacy asdf shims can still serve Java/Kotlin/Python without taking Node back.
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi

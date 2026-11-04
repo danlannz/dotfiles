@@ -45,6 +45,7 @@ case "$target" in "$HOME"/*|"$CUSTOM_ROOT"/*) mkdir -p "$target" ;; *) exit 91 ;
     mackup: 'printf "mackup\\n" >> "$TRACE"',
     brew: 'printf "%s/nvm\\n" "$FIXTURE"',
     bun: 'printf "agent setup\\n" >> "$TRACE"',
+    mise: 'printf "mise %s\\n" "$*" >> "$TRACE"\n[ "${MISE_STATUS:-0}" = 0 ] || exit "$MISE_STATUS"\nprintf "agent setup\\n" >> "$TRACE"',
   };
   for (const [name, body] of Object.entries(commands)) {
     writeFileSync(join(directory, 'bin', name), `#!/bin/sh\n${body}\n`, { mode: 0o755 });
@@ -83,6 +84,27 @@ test.each([false, true])('shell installation preserves existing zshrc (symlink=%
   expect(result.trace).not.toContain('changed login shell');
   expect(result.trace).not.toContain('launched interactive shell');
   expect(result.trace).toContain('agent setup');
+});
+
+test('runtime and agent setup delegate to mise rather than installing NVM or fallback Brew Bun', () => {
+  const result = run();
+  expect(result.exitCode).toBe(0);
+  expect(result.trace).toContain('run agents');
+  expect(result.trace).not.toContain('nvm install');
+  expect(result.trace).not.toContain('nvm use');
+});
+
+test('default setup defers account-dependent restoration so it cannot undo managed shell files', () => {
+  const result = run();
+  expect(result.exitCode).toBe(0);
+  expect(result.trace).not.toContain('mackup');
+  expect(result.stdout.toString()).toContain('run restore-settings');
+});
+
+test('a failed mise runtime/agent task stops the post-install hook', () => {
+  const result = run({ MISE_STATUS: '8' });
+  expect(result.exitCode).toBe(8);
+  expect(result.trace).not.toContain('agent setup');
 });
 
 test('an existing Oh My Zsh install repairs missing plugins and reruns without recloning', () => {

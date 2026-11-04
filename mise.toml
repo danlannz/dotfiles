@@ -1,0 +1,50 @@
+# Deployment only: runtime defaults live in mise/config.toml (installed globally).
+min_version = "2026.11.0"
+
+[settings.task]
+run_auto_install = false
+
+[tasks.runtimes]
+description = "Install only the reviewed runtime defaults, with a strict lockfile preflight"
+run = [
+  '''[ "{{ mise_config_dir }}/config.toml" -ef "{{ config_root }}/mise/config.toml" ] &&
+[ "{{ mise_config_dir }}/mise.lock" -ef "{{ config_root }}/mise/mise.lock" ] || {
+  echo "Deploy this checkout's mise config and lockfile with script/setup first." >&2
+  exit 1
+}''',
+  'mise -C "$HOME" install --locked',
+]
+
+[tasks.restore-settings]
+description = "Explicit account-dependent Mackup restore; review backups because it can replace deployed settings"
+raw = true
+run = "mackup restore"
+
+[tasks.agents]
+description = "Restore and validate the curated shared agent setup using managed Bun"
+depends = ["runtimes"]
+run = 'mise exec -- bun "{{ config_root }}/agents/setup.ts"'
+
+[dotfiles]
+"~/.Brewfile" = { source = ".Brewfile", mode = "symlink" }
+"~/.alias" = { source = ".alias", mode = "symlink" }
+"~/.functions" = { source = ".functions", mode = "symlink" }
+"~/.inputrc" = { source = ".inputrc", mode = "symlink" }
+"~/.mackup.cfg" = { source = ".mackup.cfg", mode = "symlink" }
+"~/.macos" = { source = ".macos", mode = "symlink" }
+"~/.path" = { source = ".path", mode = "symlink" }
+"~/.skhdrc" = { source = ".skhdrc", mode = "symlink" }
+"~/.vimrc" = { source = ".vimrc", mode = "symlink" }
+"~/.yabairc" = { source = ".yabairc", mode = "symlink" }
+"~/.zsh-dircolors.config" = { source = ".zsh-dircolors.config", mode = "symlink" }
+"~/.zshrc" = { source = ".zshrc", mode = "symlink" }
+
+[dotfiles.mise-lock]
+source = "mise/mise.lock"
+mode = "symlink"
+variants = [{ default = true, target = "{{ mise_config_dir }}/mise.lock" }]
+
+[dotfiles.mise-config]
+source = "mise/config.toml"
+mode = "symlink"
+variants = [{ default = true, target = "{{ mise_config_dir }}/config.toml" }]

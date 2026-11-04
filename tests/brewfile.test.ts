@@ -22,8 +22,13 @@ test('the Brewfile does not explicitly tap built-in or retired Homebrew sources'
   }
 });
 
-test('the selected Bun formula has formula-scoped trust, not blanket tap trust', () => {
-  expect(text).toMatch(/tap "oven-sh\/bun", trusted: \{ formulae: \["bun"\] \}/);
+test('mise owns the migrated Node/Bun setup without duplicate bootstrap managers', () => {
+  const formulas = active.filter(item => item.kind === 'brew').map(item => item.name);
+  expect(formulas).toContain('mise');
+  for (const name of ['nvm', 'oven-sh/bun/bun', 'rbenv', 'ruby-build']) expect(formulas).not.toContain(name);
+  expect(active.some(item => item.kind === 'tap' && item.name === 'oven-sh/bun')).toBe(false);
+  // Java/Kotlin/Python still have active legacy asdf requirements; not migrated yet.
+  expect(formulas).toContain('asdf');
 });
 
 test('every tool, including optional declarations, has an inline description', () => {

@@ -1,6 +1,6 @@
 # Agent configuration
 
-Shared configuration lives in `agents/`, rather than a top-level `.agents/` that the generic dotfiles bootstrap would link over machine-local agent state.
+Shared configuration lives in `agents/`. The explicit native dotfile declarations deliberately leave agent paths to this module; the former generic linker could otherwise replace machine-local agent state.
 
 ## Layout
 
@@ -39,7 +39,7 @@ Run `/reload` in Pi or start a new Claude session after editing. For discovery d
 
 ## New device
 
-The dotfiles bootstrap installs Bun if needed and runs setup. To run independently:
+The dotfiles bootstrap uses mise's locked runtime task before running this existing module through managed Bun. It does not replace the curated collection with mise's tool-bundled skill syncing. To run independently with Bun available:
 
 ```sh
 bun ~/.dotfiles/agents/setup.ts --dry-run

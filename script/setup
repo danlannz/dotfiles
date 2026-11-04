@@ -1,32 +1,23 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
 
-# Install all dotfiles into the home directory
-DOTFILESDIRREL=$(dirname $0)
-cd $DOTFILESDIRREL/..
-DOTFILESDIR=$(pwd -P)
+# Deployment is owned by the explicit native declarations, never a home-directory glob.
+ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
+if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ "$1" != --dry-run ]; }; then
+  echo "Usage: $0 [--dry-run]" >&2
+  exit 2
+fi
+command -v mise >/dev/null 2>&1 || {
+  echo "mise is required; run bootstrap.sh or install mise before deployment." >&2
+  exit 1
+}
 
-[ $(uname -s) = "Darwin" ] && export MACOS=1 && export UNIX=1
-[ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
-uname -s | grep -q "_NT-" && export WINDOWS=1
-
-for DOTFILE in $(ls -a); do
-  HOMEFILE="$HOME/$DOTFILE"
-  [ -d $DOTFILE ] && DOTFILE="$DOTFILE/"
-  DIRFILE="$DOTFILESDIR/$DOTFILE"
-  echo $DOTFILE | egrep -q '(^./$|^../$|^.git/$|^.gitignore$)' && continue
-  echo $DOTFILE | egrep -q '(^[^\.].*$)' && continue
-  echo $DOTFILE | egrep -q '(^[\.].*$)' && HOMEFILE="$HOME/$DOTFILE"
-
-  if [ $UNIX ]
-  then
-    if [ -L "$HOMEFILE" ] && ! [ -d $DOTFILE ]
-    then
-      ln -sfv "$DIRFILE" "$HOMEFILE"
-    else
-      rm -rv "$HOMEFILE"
-      ln -sv "$DIRFILE" "$HOMEFILE"
-    fi
-  else
-    cp -rv "$DIRFILE" "$HOMEFILE"
-  fi
-done
+# Trust only this checkout's reviewed declaration, not a broad directory tree.
+mise trust "$ROOT/mise.toml"
+if [ "$#" -eq 1 ]; then
+  exec mise -C "$ROOT" dot apply --dry-run
+fi
+# Native self-configuration is applied before ordinary files. Check conflicts
+# first so a real .zshrc/.Brewfile does not leave a new global config behind.
+mise -C "$ROOT" dot apply --dry-run
+exec mise -C "$ROOT" dot apply

@@ -1,0 +1,17 @@
+min_version = "2026.11.0"
+
+# Lock only our defaults; projects retain their own version/locking policy.
+[tool_config]
+locked = true
+
+[tools]
+node = "26.13.0"
+bun = "1.4.4"
+
+[settings]
+lockfile = true
+lockfile_platforms = ["macos-arm64", "macos-x64"]
+idiomatic_version_file_enable_tools = ["node"]
+# Node/Bun cutover only. Legacy Java/Kotlin/Python remain with asdf; do not
+# accidentally adopt their existing ~/.tool-versions or Ruby/Go/Rust installs.
+enable_tools = ["node", "nodejs", "bun", "pnpm"]

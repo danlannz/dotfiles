@@ -11,6 +11,8 @@ test('interactive startup loads the configured prompt from the current HOME', ()
   const home = mkdtempSync(join(tmpdir(), 'dotfiles zsh home '));
   try {
     mkdirSync(join(home, '.oh-my-zsh'));
+    mkdirSync(join(home, 'bin'));
+    writeFileSync(join(home, 'bin/mise'), '#!/bin/sh\n[ "$*" = "activate zsh" ] || exit 9\nprintf "export MISE_TEST_ACTIVATED=yes\\n"\n', { mode: 0o755 });
     copyFileSync(new URL('../.zshrc', import.meta.url), join(home, '.zshrc'));
     writeFileSync(join(home, '.oh-my-zsh/oh-my-zsh.sh'), `
 OMZ_TEST_LOADED=yes
@@ -29,16 +31,18 @@ source() {
 autoload() { :; }
 compinit() { :; }
 builtin source "$HOME/.zshrc"
-print -r -- "FRAMEWORK=$OMZ_TEST_LOADED" "THEME=$ZSH_THEME" "PROMPT=$PROMPT"
+print -r -- "FRAMEWORK=$OMZ_TEST_LOADED" "THEME=$ZSH_THEME" "PROMPT=$PROMPT" "ACTIVATED=\${MISE_TEST_ACTIVATED:-no}" "PLUGINS=$plugins"
 `], {
       cwd: home,
-      env: { HOME: home, USER: 'fixture', LOGNAME: 'fixture', PATH: '/usr/bin:/bin', TERM: 'dumb' },
+      env: { HOME: home, USER: 'fixture', LOGNAME: 'fixture', PATH: `${home}/bin:/usr/bin:/bin`, TERM: 'dumb' },
       stdout: 'pipe', stderr: 'pipe',
     });
     expect(result.exitCode).toBe(0);
     expect(result.stdout.toString()).toContain('FRAMEWORK=yes');
     expect(result.stdout.toString()).toContain('THEME=agnoster');
     expect(result.stdout.toString()).toContain('PROMPT=$(build_prompt)');
+    expect(result.stdout.toString()).toContain('ACTIVATED=yes');
+    expect(result.stdout.toString()).not.toMatch(/PLUGINS=.*\bnvm\b/);
     expect(result.stderr.toString()).not.toContain('Refusing source outside fixture HOME');
   } finally {
     rmSync(home, { recursive: true, force: true });

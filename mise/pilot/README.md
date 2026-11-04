@@ -1,6 +1,6 @@
 # Isolated mise pilot
 
-This is the first migration experiment, **not** the machine's global mise configuration. Do not activate it globally, run provisioning on the host, remove NVM/asdf, or change Brewfile runtime ownership yet. The [living backlog](../../docs/modernisation-backlog.md) remains the migration checklist.
+This is the first migration experiment, **not** the machine's global mise configuration. The results below are the original phase-one snapshot; the [deployment follow-up](../../docs/mise-deployment.md) documents the subsequent native global config/linker and current test counts. Do not activate it globally, run provisioning on the host, remove NVM/asdf, or change Brewfile runtime ownership yet. The [living backlog](../../docs/modernisation-backlog.md) remains the migration checklist.
 
 ## What is here
 
@@ -59,9 +59,9 @@ Use a subshell so even the invoking guest shell retains its normal environment:
 
 `verify` checks the isolation variables before its explicit locked install, then runs the regression suite, checks each shell file's syntax, checks both Brewfiles, runs error-level ShellCheck, and checks Git whitespace. Task auto-install is disabled so mise cannot install tools before the guard runs. The guard is pilot/test isolation, not a new production provisioning framework.
 
-Ordinary `bun test` does **not** download mise or runtimes. It runs the existing 69 tests and reports the two mise integration cases as skipped unless the private binary/environment is explicitly provided. Within the prepared pilot, all 71 cases run.
+Ordinary `bun test` does **not** download mise or runtimes; actual CLI cases are skipped unless the private binary/environment is explicitly provided. Phase one ran 69 ordinary tests plus two real-CLI cases (71 total). The current branch has additional deployment cases, also enabled by that guest-only opt-in; see the follow-up for current counts.
 
-## Observed results
+## Observed phase-one results
 
 - Actual downloaded mise-owned Node/Bun pass noninteractive executable-provenance checks.
 - `mise run verify` passes **71 tests** plus syntax/lint checks. Its task directory is independent of the caller's cwd.

@@ -139,11 +139,8 @@ run_dotfile_scripts() {
       for i in "$@"; do
         if [ -f "$i" ] && [ -x "$i" ]; then
           log "Running dotfiles $i:"
-          if [ -z "$DEBUG" ]; then
-            "$i" 2>/dev/null
-          else
-            "$i"
-          fi
+          # Preserve actionable conflict/installer diagnostics in normal runs too.
+          "$i"
           break
         fi
       done
@@ -346,9 +343,21 @@ if [ -n "$GITHUB_USER" ]; then
         git pull $Q --rebase --autostash
       )
     fi
-    run_dotfile_scripts script/setup script/bootstrap
     logk
   fi
+fi
+
+# Deployment needs mise before Bundle can read the linked Brewfile. A local
+# checkout is still usable when the GitHub availability probe is offline.
+if [ -d "$HOME/.dotfiles" ]; then
+  # Ensure the chosen provider after its metadata refresh, even when an older
+  # mise is already in PATH: linking requires the new declaration's minimum.
+  # brew install ensures this prerequisite without a blanket package upgrade.
+  log "Ensuring mise for dotfile deployment:"
+  brew install mise
+  logk
+  command -v mise >/dev/null 2>&1 || abort "mise installation did not provide a usable binary."
+  run_dotfile_scripts script/setup script/bootstrap
 fi
 
 # Setup Brewfile
