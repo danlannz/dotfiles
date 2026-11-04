@@ -24,6 +24,9 @@ node_modules
 npm-debug.log
 yarn-error.log
 
+# Isolated development worktrees
+/.worktrees/
+
 # Downloaded agent skills are restored from agents/.skill-lock.json.
 # Only personal skills using the reserved local- prefix are version-controlled.
 /agents/skills/*
