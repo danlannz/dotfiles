@@ -50,7 +50,12 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-fpath=($HOME/.asdf/completions $fpath)
+# Dependent plugins need managed tool paths before Oh My Zsh loads them.
+[[ -s "$HOME/.path" ]] && source "$HOME/.path"
+
+# Oh My Zsh owns compinit. Register completion directories before its one pass.
+[[ -d "$HOME/.asdf/completions" ]] && fpath=("$HOME/.asdf/completions" $fpath)
+[[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
 plugins=(bundler git node npm macos web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf doctl asdf)
 
 source "$ZSH/oh-my-zsh.sh"
@@ -80,8 +85,12 @@ source "$ZSH/oh-my-zsh.sh"
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 [[ -s ~/.alias ]] && source ~/.alias
-[[ -s ~/.path ]] && source ~/.path
 [[ -s ~/.functions ]] && source ~/.functions
+
+# Zsh already knows its tty; do not spawn tty or a GPG agent at startup.
+if [[ -t 0 ]] && command -v gpg >/dev/null 2>&1; then
+  export GPG_TTY="$TTY"
+fi
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -89,11 +98,9 @@ export REACT_EDITOR=code
 
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=("$HOME/.docker/completions" $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
+
+# User-owned device paths/aliases are never deployed or overwritten by setup.
+[[ -f "$HOME/.zshrc.local" && -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
 # Mise owns Node/Bun (and project pnpm). Activate after other PATH writers so
 # legacy asdf shims can still serve Java/Kotlin/Python without taking Node back.

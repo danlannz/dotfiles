@@ -1,42 +1,78 @@
 #!/bin/sh
-export LOCAL_BIN="/usr/local/bin"
-export LOCAL_SBIN="/usr/local/sbin"
+# Sourced by the shell: add only existing absolute directories, once. Preserve
+# inherited PATH entries and explicit user values rather than pruning them.
+_dotfiles_add_path() {
+  case "$1" in /*) ;; *) return 0 ;; esac
+  [ -d "$1" ] || return 0
+  case ":${PATH:-}:" in *":$1:"*) return 0 ;; esac
+  if [ "${2:-}" = prepend ]; then
+    PATH="$1${PATH:+:$PATH}"
+  else
+    PATH="${PATH:+$PATH:}$1"
+  fi
+}
 
-export DOT_LOCAL="$HOME/.local/bin"
+export LOCAL_BIN="${LOCAL_BIN:-/usr/local/bin}"
+export LOCAL_SBIN="${LOCAL_SBIN:-/usr/local/sbin}"
+export DOT_LOCAL="${DOT_LOCAL:-$HOME/.local/bin}"
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+export BUN_BIN="${BUN_BIN:-$HOME/.bun/bin}"
+export GOPATH="${GOPATH:-$HOME/go}"
+export GIT_FUZZY_BIN="${GIT_FUZZY_BIN:-$HOME/.oh-my-zsh/custom/plugins/git-fuzzy/bin}"
 
-# pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
+# Avoid a brew subprocess on every startup. An explicit prefix takes priority;
+# otherwise select the native macOS prefix, never the other CPU's installation.
+_dotfiles_prefix="${HOMEBREW_PREFIX:-}"
+if [ -z "$_dotfiles_prefix" ]; then
+  case "$(uname -m)" in
+    arm64) _dotfiles_prefix=/opt/homebrew ;;
+    x86_64) _dotfiles_prefix=/usr/local ;;
+  esac
+fi
+if [ -n "$_dotfiles_prefix" ] && [ -d "$_dotfiles_prefix/bin" ]; then
+  export HOMEBREW_PREFIX="$_dotfiles_prefix"
+  _dotfiles_add_path "$_dotfiles_prefix/bin" prepend
+  _dotfiles_add_path "$_dotfiles_prefix/sbin"
+  export LIB_PQ="${LIB_PQ:-$_dotfiles_prefix/opt/libpq/bin}"
+fi
 
-# bun
-export BUN_BIN="$HOME/.bun/bin"
+for _dotfiles_dir in "$LOCAL_BIN" "$LOCAL_SBIN" "$DOT_LOCAL" "$PNPM_HOME" "$BUN_BIN" "$GIT_FUZZY_BIN" "${LIB_PQ:-}"; do
+  _dotfiles_add_path "$_dotfiles_dir"
+done
 
-# Vulkan SDK
-export VULKAN_SDK=$HOME/vulkan_sdk/macOS
-export VULKAN_SDK_BIN=$VULKAN_SDK/bin
-export DYLD_LIBRARY_PATH=$VULKAN_SDK/lib:$DYLD_LIBRARY_PATH
-export VK_ICD_FILENAMES=$VULKAN_SDK/etc/vulkan/icd.d/MoltenVK_icd.json
-export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
+# Search Go tool binaries in explicit GOBIN or the configured GOPATH roots' bin directories.
+if [ -n "${GOBIN:-}" ]; then
+  _dotfiles_add_path "$GOBIN"
+else
+  _dotfiles_gopath="$GOPATH"
+  while :; do
+    _dotfiles_go_dir="${_dotfiles_gopath%%:*}"
+    [ -z "$_dotfiles_go_dir" ] || _dotfiles_add_path "$_dotfiles_go_dir/bin"
+    case "$_dotfiles_gopath" in
+      *:*) _dotfiles_gopath="${_dotfiles_gopath#*:}" ;;
+      *) break ;;
+    esac
+  done
+fi
 
-# Android CLI tools
-export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk/"
-export ANDROID_TOOLS=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+# Keep Android's conventional location, but advertise only installed tools.
+_dotfiles_sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Library/Android/sdk}}"
+_dotfiles_sdk="${_dotfiles_sdk%/}"
+if [ -d "$_dotfiles_sdk" ]; then
+  export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$_dotfiles_sdk}"
+  export ANDROID_HOME="${ANDROID_HOME:-$_dotfiles_sdk}"
+  ANDROID_TOOLS=''
+  for _dotfiles_dir in "$_dotfiles_sdk/emulator" "$_dotfiles_sdk/platform-tools" "$_dotfiles_sdk/cmdline-tools/latest/bin"; do
+    if [ -d "$_dotfiles_dir" ]; then
+      _dotfiles_add_path "$_dotfiles_dir"
+      ANDROID_TOOLS="${ANDROID_TOOLS:+$ANDROID_TOOLS:}$_dotfiles_dir"
+    fi
+  done
+  export ANDROID_TOOLS
+fi
 
-# JS dev tools
-export CWD_NODE_MODULES_BIN="./node_modules/.bin"
-
-# Go
-export GOPATH=$HOME/go
-
-# Git Fuzzy
-export GIT_FUZZY_BIN="$HOME/.oh-my-zsh/custom/plugins/git-fuzzy/bin"
-
-#GPG
-export GPG_TTY=$(tty)
-
-# Database CLI tools
-export LIB_PQ="/opt/homebrew/opt/libpq/bin"
-
-# export POSTGRES_BIN=/usr/local/opt/libpq/bin
-# export COUCHBASE_BIN=/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin
-
-export PATH=$PATH:$LOCAL_BIN:$DOT_LOCAL:$VULKAN_SDK_BIN:$ANDROID_TOOLS:$CWD_NODE_MODULES_BIN:$GOPATH:$GIT_FUZZY_BIN:$LIB_PQ:$LOCAL_SBIN:$PNPM_HOME:$BUN_BIN
+# No project-relative node_modules/.bin or global Vulkan/DYLD injection.
+# Use the project's package runner and explicit project/command SDK settings.
+export PATH
+unset _dotfiles_prefix _dotfiles_dir _dotfiles_gopath _dotfiles_go_dir _dotfiles_sdk
+unset -f _dotfiles_add_path

@@ -10,7 +10,7 @@ mise run verify
 
 This runs the regression suite and `lint` from the checkout, independent of the caller's working directory. It does **not** deploy files, restore agents/settings, install runtimes/apps, open iTerm or change preferences. Task auto-install is disabled. The task clears `DOTFILES_TEST_ROOT`, `DOTFILES_TEST_MISE_BIN` and `DOTFILES_ITERM_FIRST_LAUNCH`, so inherited opt-ins cannot turn an ordinary check into a VM/GUI test. Missing prerequisites or a failed test/lint command fail verification; checks are not silently skipped to make the task pass.
 
-`mise run lint` checks each shell file separately in its correct dialect, both Brewfiles with Ruby, error-level ShellCheck and Git whitespace. Bootstrap and `script/setup` declare and are checked with Bash, including macOS's system Bash 3.2; they are not POSIX-sh scripts.
+`mise run lint` checks each shell file separately in its correct dialect, both Brewfiles with Ruby, error-level ShellCheck and Git whitespace. Bootstrap and `script/setup` declare and are checked with Bash, including macOS's system Bash 3.2; they are not POSIX-sh scripts. The PATH fragment additionally gets a POSIX `sh -n` check, and ShellCheck covers both `.path` and `.functions`.
 
 Without mise, `bun test` remains the ordinary regression command. It does not download mise or runtimes. Do not install or activate mise on the host solely to test this worktree; host promotion needs separate approval.
 
@@ -76,6 +76,12 @@ DOTFILES_ITERM_FIRST_LAUNCH=1 bun test tests/terminal-first-launch.test.ts
 ```
 
 This explicitly opens iTerm normally and checks automatic default selection and GUID collisions without choosing a profile. OS/app consent dialogs may need a human response. Both normal verification tasks clear this GUI opt-in. A relaunch check is not an untouched first-account provisioning result; record that distinction. See [terminal evidence and limits](terminal-setup.md).
+
+## Shell startup checks
+
+Shell fixtures source the actual managed rc/path/functions in temporary homes, with external framework/tool boundaries replaced. They cover one completion pass, early path/fpath availability, absent optional tools, lazy correction initialization/failure, tty-aware GPG, inherited settings, guarded SDK/Go/Homebrew paths and the ignored local override. PTY tests do not source the developer's live rc or invoke its GPG tools.
+
+The real guest rc/Oh My Zsh was separately measured before/after with the same PTY protocol, and a functional PTY check preserves Agnoster/fzf and mise Node/Bun provenance/switching. Timing instrumentation stays outside Git and production startup. See [shell setup](shell-setup.md) for the measurements and scope; they are not a universal performance threshold or an iTerm GUI assertion.
 
 ## Historical pilot
 

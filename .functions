@@ -31,8 +31,15 @@ gcobr() {
   git checkout $(awk '{print $2}' <<<"$target" | sed 's/origin\///')
 }
 
-# GPG
-gpgconf --launch gpg-agent
+# GPG starts its agent on demand; shell startup must not launch it eagerly.
 
-# fuck() correct previous console commands
-eval $(thefuck --alias)
+# Keep command correction available without starting Python in every shell.
+if command -v thefuck >/dev/null 2>&1; then
+  fuck() {
+    local _dotfiles_correction
+    _dotfiles_correction="$(thefuck --alias)" || return
+    unset -f fuck
+    eval "$_dotfiles_correction" || return
+    fuck "$@"
+  }
+fi

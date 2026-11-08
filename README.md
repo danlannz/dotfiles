@@ -45,6 +45,8 @@ The Oh My Zsh installer runs with `--unattended --keep-zshrc`: it preserves exis
 
 Shell/framework, Bun completion, Docker completion, and per-user tool paths use `$HOME`, not a machine-specific account directory. Open a new terminal tab (or run `exec zsh -l`) after updating shell configuration. The managed **Dotfiles** iTerm profile uses 12-point Meslo Nerd Font Mono and the existing dark palette. A new profile-less installation gets a usable default; existing profiles/default choices are preserved. See [terminal setup](docs/terminal-setup.md) for selection, editing and verification limits.
 
+Managed paths and existing Docker/asdf completion directories are available before Oh My Zsh's single completion initialization. GPG agents start on demand, command correction initializes only when used, and optional `~/.zshrc.local` supplies user-owned overrides before final mise activation. SDK/library settings are no longer injected into every shell. See [shell startup and PATH ownership](docs/shell-setup.md) for scope, compatibility and measured guest startup results.
+
 ### iTerm profile
 
 The maintained font cask is in `.Brewfile`; mise seeds native, editable iTerm JSON without replacing custom files or neighbouring profiles. There is no iCloud dependency or unchecked font download.

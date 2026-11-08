@@ -16,6 +16,7 @@ beforeEach(() => {
   repo = join(root, 'checkout'); home = join(root, 'home');
   mkdirSync(repo); mkdirSync(home); mkdirSync(join(root, 'bin'));
   copyFileSync(join(source, 'mise.toml'), join(repo, 'mise.toml'));
+  copyFileSync(join(source, '.path'), join(repo, '.path'));
   writeFileSync(join(home, '.zshrc'), 'user configuration\n');
   symlinkSync(nativeMise, join(root, 'bin/mise'));
   // External command boundaries: no recursive test suite or machine tools run.

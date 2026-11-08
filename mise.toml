@@ -9,10 +9,11 @@ description = "Check shell/Brewfile syntax, ShellCheck errors and Git whitespace
 dir = "{{ config_root }}"
 run = [
   'for file in bootstrap.sh script/setup script/after-setup script/setup-app-store .path .functions .alias; do bash -n "$file" || exit; done',
+  'sh -n .path',
   'zsh -fn .zshrc',
   'ruby -c .Brewfile',
   'ruby -c Brewfile.app-store',
-  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store',
+  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store .path .functions',
   'git diff --check',
 ]
 
