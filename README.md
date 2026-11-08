@@ -6,9 +6,11 @@ My OSX dotfiles
 
 Run the following command in a terminal to bootstrap a new machine
 
+```sh
+/bin/bash -c 'bootstrap="$(curl -fsSL https://raw.githubusercontent.com/danlannz/dotfiles/master/bootstrap.sh)" && /bin/bash -c "$bootstrap" bootstrap.sh "$@"' --
 ```
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/danlannz/dotfiles/master/bootstrap.sh)"
-```
+
+Bootstrap requires Bash (including macOS's system `/bin/bash`), not POSIX `sh`. The outer Bash command stops if the download fails; the inner Bash runs only a successful download. Optional `--debug` / `--app-store` flags go after the final `--`.
 
 ### App Store apps
 

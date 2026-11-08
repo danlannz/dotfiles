@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # based on this https://github.com/mikemcquaid/strap
 #/ Usage: bootstrap.sh [--debug] [--app-store]

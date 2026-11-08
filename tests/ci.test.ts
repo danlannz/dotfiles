@@ -1,0 +1,31 @@
+import { expect, test } from 'bun:test';
+import { readFileSync } from 'node:fs';
+
+test('CI uses pinned read-only actions and ordinary verification, not machine or VM provisioning', () => {
+  const workflow = Bun.YAML.parse(readFileSync(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'));
+  expect(Object.keys(workflow.on)).toContain('pull_request');
+  expect(Object.keys(workflow.on)).toContain('push');
+  expect(workflow.permissions).toEqual({ contents: 'read' });
+  const job = workflow.jobs.verify;
+  expect(job['runs-on']).toBe('macos-15');
+  expect(job['timeout-minutes']).toBeLessThanOrEqual(30);
+  const actions = job.steps.filter((step: { uses?: string }) => step.uses);
+  for (const action of actions) expect(action.uses).toMatch(/^[\w-]+\/[\w-]+@[a-f0-9]{40}$/);
+  const checkout = actions.find((step: { uses: string }) => step.uses.startsWith('actions/checkout@'));
+  expect(checkout.with['persist-credentials']).toBe(false);
+  const mise = actions.find((step: { uses: string }) => step.uses.startsWith('jdx/mise-action@'));
+  expect(mise.with.install).toBe(false);
+  expect(mise.with.cache).toBe(false);
+  expect(mise.with.env).toBe(false);
+  expect(mise.with.sha256).toMatch(/^[a-f0-9]{64}$/);
+  const commands = job.steps.map((step: { run?: string }) => step.run || '').join('\n');
+  expect(commands).toContain('$RUNNER_TEMP/dotfiles-ci/config');
+  expect(commands).toContain('"$GITHUB_ENV"');
+  expect(commands).toContain('mise/config.toml');
+  expect(commands).toContain('mise/mise.lock');
+  expect(commands).toContain('mise install --locked');
+  expect(commands).toContain('mise run verify');
+  expect(commands).not.toMatch(/\bsudo\b|bootstrap\.sh|script\/setup|verify:vm|terminal-default|restore-settings|brew bundle/);
+  expect(job.env).not.toHaveProperty('DOTFILES_TEST_MISE_BIN');
+  expect(job.env).not.toHaveProperty('DOTFILES_ITERM_FIRST_LAUNCH');
+});

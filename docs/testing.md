@@ -10,9 +10,25 @@ mise run verify
 
 This runs the regression suite and `lint` from the checkout, independent of the caller's working directory. It does **not** deploy files, restore agents/settings, install runtimes/apps, open iTerm or change preferences. Task auto-install is disabled. The task clears `DOTFILES_TEST_ROOT`, `DOTFILES_TEST_MISE_BIN` and `DOTFILES_ITERM_FIRST_LAUNCH`, so inherited opt-ins cannot turn an ordinary check into a VM/GUI test. Missing prerequisites or a failed test/lint command fail verification; checks are not silently skipped to make the task pass.
 
-`mise run lint` checks each shell file separately in its correct dialect, both Brewfiles with Ruby, error-level ShellCheck and Git whitespace. `script/setup` is checked with Bash, not the obsolete pilot's sh check. Bootstrap's historical `/bin/sh` shebang/Bash-syntax mismatch remains a separate audit item; syntax checking it as Bash is not proof the published shell command is portable.
+`mise run lint` checks each shell file separately in its correct dialect, both Brewfiles with Ruby, error-level ShellCheck and Git whitespace. Bootstrap and `script/setup` declare and are checked with Bash, including macOS's system Bash 3.2; they are not POSIX-sh scripts.
 
 Without mise, `bun test` remains the ordinary regression command. It does not download mise or runtimes. Do not install or activate mise on the host solely to test this worktree; host promotion needs separate approval.
+
+## Bootstrap entry-point checks
+
+Bootstrap now declares `/bin/bash`, and the README's download command explicitly invokes Bash. A failed `curl` must fail the outer command rather than executing an empty installer; optional arguments after the final `--` reach bootstrap unchanged.
+
+Tests execute the actual file without an interpreter override and execute the exact README command with a controlled download. Only OS/package/network boundaries are replaced, with a fail-closed sudo executable if a shell drops the exported mocks. They cover interpreter selection, successful download execution, download failure and argument forwarding. A bare executable invocation with `--unknown` also exits **2** in the disposable macOS guest before privileged work. These checks do **not** validate the unpublished branch through the remote `master` URL, or rerun privileged provisioning on the host.
+
+## Continuous integration
+
+[`.github/workflows/verify.yml`](../.github/workflows/verify.yml) defines push, pull-request and manual checks with read-only repository permissions, SHA-pinned checkout/mise actions, no persisted checkout credentials and a 25-minute deadline. It uses the ARM64 `macos-15` image, with an explicit architecture assertion; Intel execution remains separate.
+
+The mise action installs the tested **2026.11.2** engine and checks its executable against the published release SHA-256. This is a binary integrity check, not independent signature verification. Node/Bun versions are **not duplicated in workflow inputs**: temporary mise config/lock links point to the production declarations, and dependencies are installed with `mise install --locked` plus native executable checks. ShellCheck is installed on the ephemeral runner only if missing. No normal-home dotfile deployment, Brewfile bundle, privileged bootstrap, account/cloud restore or VM/GUI task runs in CI. The last step is the same host-safe `mise run verify` command used locally.
+
+The workflow was validated with **actionlint 1.7.12** and a Bun policy test. The public entry-point tests and full VM suite pass on Sequoia ARM64. A real GitHub-hosted workflow run remains pending publishing this branch; a workflow file and local lint are not evidence of a green remote CI run.
+
+Primary references: [mise action inputs/source](https://github.com/jdx/mise-action/tree/5228313ee0372e111a38da051671ca30fc5a96db), [mise 2026.11.2 assets](https://github.com/jdx/mise/releases/tag/v2026.11.2), [runner image/architecture labels](https://github.com/actions/runner-images#available-images).
 
 ## Native integration — prepared disposable macOS VM only
 

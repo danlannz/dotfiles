@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 let directory: string;
 const bootstrap = fileURLToPath(new URL('../bootstrap.sh', import.meta.url));
+const documentedCommand = readFileSync(new URL('../README.md', import.meta.url), 'utf8').match(/```(?:bash|sh)?\n([\s\S]*?)\n```/)![1];
 
 // Run the real public bootstrap command. Only OS/package/network boundaries are
 // replaced; no sudo, package manager, installer, or Git mutation can reach the host.
@@ -20,7 +21,7 @@ function [() {
 }
 function uname() { printf '%s\n' "$FAKE_ARCH"; }
 function groups() { printf 'staff admin\n'; }
-function sudo() { printf 'sudo %s\n' "$*" >> "$TRACE"; }
+function sudo() { printf 'bootstrap interpreter=%s\nsudo %s\n' "$BASH" "$*" >> "$TRACE"; }
 function defaults() { :; }
 function caffeinate() { :; }
 function fdesetup() { printf 'FileVault is On.\n'; }
@@ -46,6 +47,7 @@ function softwareupdate() { printf 'No new software available.\n'; }
 function curl() {
   printf 'curl %s\n' "$*" >> "$TRACE"
   if builtin [ "$DOWNLOAD_STATUS" != 0 ]; then return "$DOWNLOAD_STATUS"; fi
+  if builtin [ "$ENTRYPOINT" = documented ]; then /bin/cat "$BOOTSTRAP_SCRIPT"; return; fi
   local output=''
   while builtin [ "$#" -gt 0 ]; do
     case "$1" in -o|--output) output="$2"; shift ;; esac
@@ -80,6 +82,8 @@ function brew() {
   esac
 }
 export -f '[' uname groups sudo defaults caffeinate fdesetup chown mkdir ln git curl brew softwareupdate command mise
+if builtin [ "$ENTRYPOINT" = documented ]; then eval "$DOCUMENTED_BOOTSTRAP"; exit; fi
+if builtin [ "$ENTRYPOINT" = executable ]; then exec "$BOOTSTRAP_SCRIPT" "$@"; fi
 exec /bin/bash "$BOOTSTRAP_SCRIPT" "$@"
 `;
 
@@ -87,6 +91,10 @@ beforeEach(() => {
   directory = realpathSync(mkdtempSync(join(tmpdir(), 'dotfiles-bootstrap-test-')));
   mkdirSync(join(directory, 'home'));
   mkdirSync(join(directory, 'tmp'));
+  mkdirSync(join(directory, 'bin'));
+  // If a non-Bash interpreter drops exported functions, fail closed before
+  // any real privileged command can reach the host.
+  writeFileSync(join(directory, 'bin/sudo'), '#!/bin/sh\nexit 91\n', { mode: 0o755 });
   const fixtureRepo = join(directory, 'home/.dotfiles');
   mkdirSync(join(fixtureRepo, 'script'), { recursive: true });
   copyFileSync(fileURLToPath(new URL('../script/setup-app-store', import.meta.url)), join(fixtureRepo, 'script/setup-app-store'));
@@ -97,14 +105,14 @@ beforeEach(() => {
 
 afterEach(() => rmSync(directory, { recursive: true, force: true }));
 
-function run(overrides: Record<string, string> = {}, args: string[] = []) {
+function run(overrides: Record<string, string> = {}, args: string[] = [], entrypoint = 'bash') {
   const result = Bun.spawnSync(['/bin/bash', '-c', boundaries, 'fixture', ...args], {
     cwd: directory,
     // Deliberately do not inherit host credentials, Git configuration, or shell setup.
     env: {
-      HOME: join(directory, 'home'), USER: 'fixture', PATH: '/usr/bin:/bin:/usr/sbin:/sbin',
+      HOME: join(directory, 'home'), USER: 'fixture', PATH: `${directory}/bin:/usr/bin:/bin:/usr/sbin:/sbin`, ENTRYPOINT: entrypoint,
       CI: '1', TMPDIR: join(directory, 'tmp'), TRACE: join(directory, 'trace'),
-      BOOTSTRAP_SCRIPT: bootstrap, FAKE_ARCH: 'arm64', EXISTING_BREW: '', HOMEBREW_PREFIX: '',
+      BOOTSTRAP_SCRIPT: bootstrap, DOCUMENTED_BOOTSTRAP: documentedCommand, FAKE_ARCH: 'arm64', EXISTING_BREW: '', HOMEBREW_PREFIX: '',
       HAVE_MISE: '1', MISE_INSTALL_STATUS: '0', MISE_NO_BINARY: '0', MISE_MARKER: join(directory, 'mise-installed'),
       DOWNLOAD_STATUS: '0', INSTALL_STATUS: '0', BREW_MARKER: join(directory, 'native-brew-installed'), STOP_AT_UPDATE: '1', CONTINUE_TO_BUNDLE: '0', APP_STORE_CHECK_STATUS: '0', APP_STORE_INSTALL_STATUS: '0', ...overrides,
     },
@@ -113,6 +121,32 @@ function run(overrides: Record<string, string> = {}, args: string[] = []) {
   const trace = existsSync(join(directory, 'trace')) ? readFileSync(join(directory, 'trace'), 'utf8') : '';
   return { ...result, trace };
 }
+
+test('the executable entry point selects Bash without an explicit interpreter override', () => {
+  const result = run({ EXISTING_BREW: '/opt/homebrew/bin/brew' }, [], 'executable');
+  expect(result.exitCode, result.stderr.toString()).toBe(77);
+  expect(result.trace).toContain('bootstrap interpreter=/bin/bash');
+});
+
+test('the documented download command propagates fetch failure without running an empty installer', () => {
+  const result = run({ DOWNLOAD_STATUS: '22' }, [], 'documented');
+  expect(result.exitCode, result.stderr.toString()).toBe(22);
+  expect(result.trace).toContain('curl ');
+  expect(result.trace).not.toContain('sudo ');
+});
+
+test('the documented command executes a successful download with Bash', () => {
+  const result = run({ EXISTING_BREW: '/opt/homebrew/bin/brew' }, [], 'documented');
+  expect(result.exitCode, result.stderr.toString()).toBe(77);
+  expect(result.trace).toContain('bootstrap interpreter=/bin/bash');
+});
+
+test('flags appended to the documented command reach bootstrap before privileged work', () => {
+  const result = run({ DOCUMENTED_BOOTSTRAP: `${documentedCommand} --unknown` }, [], 'documented');
+  expect(result.exitCode, result.stderr.toString()).toBe(2);
+  expect(result.stderr.toString()).toContain('Unknown option: --unknown');
+  expect(result.trace).not.toContain('sudo ');
+});
 
 test('fresh Apple Silicon setup installs native Homebrew before updating it', () => {
   const result = run();
