@@ -41,7 +41,13 @@ Mise owns pinned Node/Bun defaults and existing project Node/pnpm requirements. 
 
 The Oh My Zsh installer runs with `--unattended --keep-zshrc`: it preserves existing `.zshrc` files/symlinks, does not change the login shell, and does not launch an interactive shell. Missing custom plugins are repaired on reruns; existing plugin directories are left alone. Oh My Zsh download/installer and plugin-clone failures stop the hook.
 
-Shell/framework, Bun completion, Docker completion, and per-user tool paths use `$HOME`, not a machine-specific account directory. Open a new terminal tab (or run `exec zsh -l`) after updating shell configuration. For Agnoster's separator glyphs, select an installed Powerline/Nerd Font such as **Hack Nerd Font** in your terminal profile; font installation alone does not select it in iTerm.
+Shell/framework, Bun completion, Docker completion, and per-user tool paths use `$HOME`, not a machine-specific account directory. Open a new terminal tab (or run `exec zsh -l`) after updating shell configuration. The managed **Dotfiles** iTerm profile uses 12-point Meslo Nerd Font Mono and the existing dark palette. A new profile-less installation gets a usable default; existing profiles/default choices are preserved. See [terminal setup](docs/terminal-setup.md) for selection, editing and verification limits.
+
+### iTerm profile
+
+The maintained font cask is in `.Brewfile`; mise seeds native, editable iTerm JSON without replacing custom files or neighbouring profiles. There is no iCloud dependency or unchecked font download.
+
+On an existing installation, select **Dotfiles** in iTerm Settings and set it as default if desired. Or, with iTerm quit, explicitly run `mise -C ~/.dotfiles run terminal-default` from another terminal. Normal setup never changes an existing default or restarts iTerm. These are deployment commands, not commands to run on the host merely to test the worktree.
 
 ### Coding-agent skills
 
@@ -50,6 +56,12 @@ See [agents/README.md](agents/README.md) for the shared Pi/Claude Code configura
 ### Cloud settings
 
 Default setup defers Mackup restoration so an old backup cannot silently undo the deployed shell settings. After signing in and reviewing the backup, run `mise -C ~/.dotfiles run restore-settings` explicitly. Failures are reported; real account-dependent restoration is not tested in credential-free guests.
+
+### Verification
+
+With existing tooling, `mise run verify` runs host-safe tests and lint without provisioning or enabling VM/GUI tests. `mise run lint` runs only syntax/lint checks. `bun test` remains available without mise.
+
+Native integrations use the separate `mise run verify:vm` task in a prepared disposable macOS guest; GUI launch acceptance is a further explicit opt-in. See [testing](docs/testing.md) for prerequisites and isolation. The original pilot task/config/lock are retired, not production setup dependencies.
 
 ### Modernisation
 

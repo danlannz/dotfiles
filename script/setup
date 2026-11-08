@@ -20,4 +20,6 @@ fi
 # Native self-configuration is applied before ordinary files. Check conflicts
 # first so a real .zshrc/.Brewfile does not leave a new global config behind.
 mise -C "$ROOT" dot apply --dry-run
-exec mise -C "$ROOT" dot apply
+# This command already represents explicit deployment consent. Skip only the
+# terminal confirmation, never the conflict checks (--force is not used).
+exec mise -C "$ROOT" dot apply --yes

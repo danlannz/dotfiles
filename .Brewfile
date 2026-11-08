@@ -92,6 +92,7 @@ cask "docker-desktop"                                            # Docker contai
 cask "expo-orbit"                                                # Launch mobile builds and manage simulator workflows
 cask "firefox"                                                   # Firefox web browser
 cask "font-hack-nerd-font"                                       # Hack developer font with Nerd Font icons
+cask "font-meslo-lg-nerd-font"                                    # Meslo Nerd Font for the managed 12-point iTerm profile
 cask "ghostty"                                                   # GPU-accelerated native terminal emulator
 cask "google-chrome"                                             # Google Chrome web browser
 cask "handbrake-app"                                             # Convert and transcode video files

@@ -1,5 +1,6 @@
 # Safe deployment and runtime cutover
 
+This records the runtime/deployment checkpoint committed as `91766ce`. The subsequent [terminal follow-up](terminal-setup.md) adds an editable profile seed and conservative preference stage; the counts below describe this checkpoint, not the expanded suite.
 ## Status and ownership
 
 Implemented on the isolated `chore/mise-deployment` worktree, not applied to the host. The host's startup-file symlinks still point into the original checkout. Tests that use actual mise run only in the disposable ARM macOS guest, with a private HOME/config/cache/state and mise-owned runtime data.
@@ -34,7 +35,7 @@ mise -C "$PWD" run runtimes
 mise -C "$PWD" run agents
 ```
 
-`script/setup` trusts only the checkout's reviewed root declaration, runs a native dry-run preflight, then delegates to native `mise dot apply`. The preflight catches ordinary file conflicts before native self-configuration can link a new global config; a failed-before-fix regression covers that otherwise-partial change. The preview does not write destination links, though mise can initialise its own trust/cache state. There is no hidden-file enumeration, file deletion, automatic adoption/history, `--force`, pruning or second inventory.
+`script/setup` trusts only the checkout's reviewed root declaration, runs a native dry-run preflight, then delegates to native `mise dot apply --yes`. Explicit confirmation is needed even with `CI=1` when bootstrap has a real terminal for sudo; it skips the confirmation prompt, not conflict checks. A native Bun PTY regression rejects the pre-fix deployment and passes with this flag. The preflight catches ordinary file conflicts before native self-configuration can link a new global config; a failed-before-fix regression covers that otherwise-partial change. The preview does not write destination links, though mise can initialise its own trust/cache state. There is no hidden-file enumeration, file deletion, automatic adoption/history, `--force`, pruning or second inventory.
 
 Native behaviour, verified in the guest:
 
@@ -43,19 +44,25 @@ Native behaviour, verified in the guest:
 - Wrong/broken symlinks are repointed. Their old targets are **not** deleted. This is native mise semantics, not a promise that existing symlink destinations remain active.
 - Mise applies its own config first and reloads it. A regression verifies that unrelated retired dotfile rules in an old global-config symlink are not applied after that replacement.
 - Native target variants honour `MISE_CONFIG_DIR`/XDG config placement. The global lockfile is linked alongside the global config, as required by mise's symlinked-global-config lockfile behaviour.
-- Only the 12 listed dotfiles and two mise files are deployed. Repository metadata, worktrees and agent directories are not implicitly linked. `.macos` is linked, **not executed**.
+- At this checkpoint, only the 12 listed dotfiles and two mise files are deployed; the terminal follow-up adds one copy-if-missing profile, not a broader directory deployment. Repository metadata, worktrees and agent directories are not implicitly linked. `.macos` is linked, **not executed**.
 
 If there is a conflict, review it and make an intentional backup/migration before retrying. Do not add `--force` to make setup pass. Deployment is not a transaction with universal rollback, especially across native self-configuration phases.
 
 ## Strict runtime stage
 
-The `runtimes` task disables task auto-install, checks that this checkout's global config **and** lockfile are deployed, and explicitly invokes native `mise install --locked` before the dependent `agents` task can execute Bun. A missing or incomplete lockfile fails even when matching tools already exist elsewhere on PATH. This avoids the raw-exec fallback found in the original pilot; executable provenance is also tested.
+The `runtimes` task disables task auto-install, checks that this checkout's global config **and** lockfile are deployed, explicitly invokes native `mise install --locked`, then requires native `mise which node` and `mise which bun` to succeed before the dependent `agents` task can execute Bun. A missing or incomplete lockfile fails even when matching tools already exist elsewhere on PATH. This avoids the raw-exec fallback found in the original pilot; executable provenance is also tested.
 
-A fresh bootstrap installs the default tools, **not every old project's versions or global npm packages**. Existing NVM/asdf installations are not shared with mise. On first use of each project, run `mise install` there, then verify its selected versions; do not treat an already-installed legacy runtime as a completed project cutover.
+A fresh bootstrap installs the default tools, **not every old project's versions or global npm packages**. Existing NVM/asdf installations are not shared with mise. On first use of each project, run `mise install` there, require `mise which node` (and `mise which pnpm` where applicable) to resolve, then verify the selected versions; do not treat an already-installed legacy runtime as a completed project cutover.
 
 Only this global configuration root is locked with `tool_config.locked`. Existing projects keep their own policy; they do not suddenly need a new project lockfile just to use an old `.nvmrc`. The native lock includes ARM64, Intel and Intel-baseline Bun download metadata/checksums. **Actual execution is verified on ARM64 only**; Intel metadata is not an Intel machine test.
 
-The original `mise/pilot/` is a separate historical experiment, not the production defaults' second authority. Update the production defaults and regenerate their native global lock with `mise lock --global`; do not hand-edit checksums.
+The original `mise/pilot/` now contains only an archive README; its duplicate runtime config/lock and temporary verify task are retired. Permanent checks are documented in [testing](testing.md), and runtime integration tests use the production config/lock rather than a second authority. Update the production defaults and regenerate their native global lock with `mise lock --global`; do not hand-edit checksums.
+
+### Interrupted-install guard
+
+The fresh-baseline follow-up with **mise 2026.11.2** exposed an additional native fallback edge. Three timed-out legacy-runtime downloads left installation directories/metadata without working Node binaries. `mise install` subsequently reported them installed, and `mise exec` silently found Homebrew's Node 26 even though `mise ls --current` correctly selected Node 16/18. Native `mise which` instead failed with a specific repair diagnostic.
+
+The default runtime task therefore checks both configured executables after locked installation. Two failed-before-fix integration cases clone the defaults into private fixture data, remove only a cloned Node/Bun binary, and require setup to fail rather than accept an existing PATH executable. No user runtime data is damaged by those tests. The incomplete legacy fixtures are repaired only in the disposable test data, using the native installer's narrowly version-scoped repair; no automatic deployment force, runtime deletion or ownership migration is introduced. Exact follow-up suite outcomes are recorded with the terminal/fresh-baseline evidence, not retroactively included in the earlier checkpoint counts below.
 
 ## Cloud restoration
 
@@ -82,7 +89,7 @@ Final branch verification: **99 tests pass in the guest** with the real mise CLI
 - Actual fresh Oh My Zsh/plugin installation and a repeated post-install hook succeeded in the private guest HOME, preserving the managed rc and deferring cloud restoration.
 - A real PTY login shell loaded the actual rc, Oh My Zsh and Agnoster, selected mise Node/Bun/Bunx, switched Node **26.13.0 → 16.20.2 → 26.13.0** on directory changes, and retained the asdf plugin without the NVM plugin.
 - The guest installed/upgraded the Homebrew mise prerequisite and passed the new regular native Bundle check. No legacy runtimes were uninstalled. Its normal user configuration was not cut over.
-- Whole privileged bootstrap, the exact published remote command, real account-dependent installs/restoration and Intel execution are still **not** end-to-end verified. iTerm profile/default-font delivery remains the next stage.
+- At this checkpoint, whole privileged bootstrap, the exact published remote command, real account-dependent installs/restoration and Intel execution were **not** end-to-end verified. The later [fresh-guest follow-up](terminal-setup.md) now records a successful resumed CI/bootstrap run after bounded package preparation/network retry; that does not validate untouched one-shot provisioning, the published remote command or signed-in/Intel stages. The terminal follow-up now implements profile/font delivery; its remaining GUI/rollout checks are tracked separately.
 
 Primary native-feature references are pinned to [managed files](https://github.com/jdx/mise/blob/v2026.11.0/docs/dotfiles/managed.md), [lockfiles](https://github.com/jdx/mise/blob/v2026.11.0/docs/dev-tools/mise-lock.md), [settings](https://github.com/jdx/mise/blob/v2026.11.0/settings.toml) and [task configuration](https://github.com/jdx/mise/blob/v2026.11.0/docs/tasks/task-configuration.md). The [Homebrew formula](https://formulae.brew.sh/formula/mise) supplies the CLI, not our runtime inventory.
 

@@ -1,5 +1,7 @@
 # Mise runtime pilot results
 
+Historical snapshot: the temporary pilot config/lock/task described below were retired after production adoption. Git commit `1831bdf` retains their exact files; [current testing](testing.md) separates ordinary verification from guarded VM integration. The results and hashes below remain the original experiment's evidence, not current commands or test counts.
+
 ## Scope and checkpoint
 
 The pre-pilot work and consolidated backlog were committed as **`d7d76e2` — `Modernise dotfiles provisioning and track the remaining backlog`**. Nothing was pushed. The [living backlog](modernisation-backlog.md) retains all original audit/README work; mise is an implementation choice, not a replacement checklist.

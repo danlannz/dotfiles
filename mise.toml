@@ -1,8 +1,58 @@
-# Deployment only: runtime defaults live in mise/config.toml (installed globally).
+# Project tasks and deployment; runtime defaults live in mise/config.toml (installed globally).
 min_version = "2026.11.0"
 
 [settings.task]
 run_auto_install = false
+
+[tasks.lint]
+description = "Check shell/Brewfile syntax, ShellCheck errors and Git whitespace without provisioning"
+dir = "{{ config_root }}"
+run = [
+  'for file in bootstrap.sh script/setup script/after-setup script/setup-app-store .path .functions .alias; do bash -n "$file" || exit; done',
+  'zsh -fn .zshrc',
+  'ruby -c .Brewfile',
+  'ruby -c Brewfile.app-store',
+  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store',
+  'git diff --check',
+]
+
+[tasks.verify]
+description = "Run host-safe regression tests and lint; never provision or enable VM/GUI tests"
+dir = "{{ config_root }}"
+run = ['bun test', 'mise run lint']
+[tasks.verify.env]
+DOTFILES_TEST_ROOT = ""
+DOTFILES_TEST_MISE_BIN = ""
+DOTFILES_ITERM_FIRST_LAUNCH = ""
+
+[tasks."verify:vm"]
+description = "Run integration fixtures only in a prepared disposable macOS VM"
+dir = "{{ config_root }}"
+run = [
+  '''root=${DOTFILES_TEST_ROOT:-}
+[ -n "$root" ] &&
+[ "$HOME" = "$root/home" ] &&
+[ "${DOTFILES_TEST_MISE_BIN:-}" = "$root/bin/mise" ] &&
+[ "${MISE_CONFIG_DIR:-}" = "$root/config" ] &&
+[ "${MISE_DATA_DIR:-}" = "$root/data" ] &&
+[ "${MISE_CACHE_DIR:-}" = "$root/cache" ] &&
+[ "${MISE_STATE_DIR:-}" = "$root/state" ] &&
+[ "$MISE_CONFIG_DIR/config.toml" -ef "{{ config_root }}/mise/config.toml" ] &&
+[ "$MISE_CONFIG_DIR/mise.lock" -ef "{{ config_root }}/mise/mise.lock" ] || {
+  echo "Use a prepared disposable VM with private test directories; see docs/testing.md." >&2
+  exit 1
+}
+case "$(uname -s):$(/usr/sbin/sysctl -n hw.model 2>/dev/null)" in
+  Darwin:VirtualMac*) ;;
+  *) echo "Integration fixtures require a prepared disposable VM, not the host." >&2; exit 1 ;;
+esac''',
+  '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which node >/dev/null',
+  '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which bun >/dev/null',
+  'bun test',
+  'mise run lint',
+]
+[tasks."verify:vm".env]
+DOTFILES_ITERM_FIRST_LAUNCH = ""
 
 [tasks.runtimes]
 description = "Install only the reviewed runtime defaults, with a strict lockfile preflight"
@@ -13,12 +63,28 @@ run = [
   exit 1
 }''',
   'mise -C "$HOME" install --locked',
+  # An interrupted download can leave metadata that looks installed. `exec`
+  # may then fall back to PATH; `which` must resolve each configured binary.
+  'mise -C "$HOME" which node >/dev/null',
+  'mise -C "$HOME" which bun >/dev/null',
 ]
 
 [tasks.restore-settings]
 description = "Explicit account-dependent Mackup restore; review backups because it can replace deployed settings"
 raw = true
 run = "mackup restore"
+
+[tasks.terminal]
+description = "Seed a usable iTerm default only for a new profile-less installation"
+raw_args = true
+skip_if = 'test "$(uname -s)" != Darwin'
+run = 'osascript -l JavaScript "{{ config_root }}/terminal/setup.js" "$HOME/Library/Application Support/iTerm2/DynamicProfiles/danlannz-dotfiles.json" "{{ config_root }}/terminal/iterm2.json"'
+
+[tasks.terminal-default]
+description = "Explicitly select Dotfiles while retaining existing profiles; quit iTerm first"
+raw_args = true
+skip_if = 'test "$(uname -s)" != Darwin'
+run = 'osascript -l JavaScript "{{ config_root }}/terminal/setup.js" "$HOME/Library/Application Support/iTerm2/DynamicProfiles/danlannz-dotfiles.json" "{{ config_root }}/terminal/iterm2.json" --make-default'
 
 [tasks.agents]
 description = "Restore and validate the curated shared agent setup using managed Bun"
@@ -38,6 +104,13 @@ run = 'mise exec -- bun "{{ config_root }}/agents/setup.ts"'
 "~/.yabairc" = { source = ".yabairc", mode = "symlink" }
 "~/.zsh-dircolors.config" = { source = ".zsh-dircolors.config", mode = "symlink" }
 "~/.zshrc" = { source = ".zshrc", mode = "symlink" }
+
+# Seed, not a symlink: iTerm can persist UI edits here without modifying Git.
+[dotfiles."~/Library/Application Support/iTerm2/DynamicProfiles/danlannz-dotfiles.json"]
+source = "terminal/iterm2.json"
+mode = "copy"
+create_if_missing = true
+permissions = "0600"
 
 [dotfiles.mise-lock]
 source = "mise/mise.lock"
