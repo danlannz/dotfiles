@@ -118,6 +118,19 @@ test('multiple GOPATH roots and an explicit Android SDK keep spaces and append o
   expect([gopath, root, androidHome, tools]).toEqual([`${a}:${b}`, sdk, sdk, `${sdk}/emulator:${sdk}/platform-tools`]);
 });
 
+test('existing native mise shims precede inherited fallback tools without duplicating PATH entries', () => {
+  const data = join(home, 'mise data');
+  mkdirSync(join(data, 'shims'), { recursive: true });
+  writeFileSync(join(data, 'shims/java'), '#!/bin/sh\nprintf "managed-shim\\n"\n', { mode: 0o755 });
+  command('java', 'printf "fallback\\n"');
+  const result = zsh('source "$HOME/.path"; source "$HOME/.path"; command -v java; java; print -r -- "$PATH"', { MISE_DATA_DIR: data });
+  expect(result.exitCode, result.stderr.toString()).toBe(0);
+  const [selected, output, path] = result.stdout.toString().trim().split('\n');
+  expect(selected).toBe(join(data, 'shims/java'));
+  expect(output).toBe('managed-shim');
+  expect(path.split(':').filter(entry => entry === join(data, 'shims'))).toHaveLength(1);
+});
+
 test('an explicit Homebrew prefix supplies its tools and libpq without invoking brew', () => {
   const prefix = join(home, 'homebrew');
   for (const path of ['bin', 'sbin', 'opt/libpq/bin']) mkdirSync(join(prefix, path), { recursive: true });

@@ -33,11 +33,11 @@ The remote command above uses published `master`; these local changes are unavai
 
 ### Deployment and runtime ownership
 
-The migration branch replaces the destructive linker with explicit native mise declarations. It requires **mise >= 2026.11.0**; bootstrap installs that prerequisite before linking the Brewfile. Existing files/directories cause a visible conflict rather than being deleted. Native symlinks can be repointed without deleting their old targets.
+The migration branch replaces the destructive linker with explicit native mise declarations. It requires **mise >= 2026.11.2**; bootstrap installs that prerequisite before linking the Brewfile. Existing files/directories cause a visible conflict rather than being deleted. Native symlinks can be repointed without deleting their old targets.
 
 See [safe deployment and runtime cutover](docs/mise-deployment.md) for preview/apply commands, rollback considerations and VM evidence. Those commands apply the invoking checkout to the user's HOME: do not run them on the host just to test a branch.
 
-Mise owns pinned Node/Bun defaults and existing project Node/pnpm requirements. The Brewfile no longer installs NVM, direct Bun or the unused Ruby build helper. **asdf remains for existing Java/Kotlin/Python requirements**; Go/Rust/uv and existing runtime installations are not removed. New defaults use the pinned Node's bundled npm rather than upgrading npm independently.
+Mise owns pinned Node/Bun/Java/Kotlin defaults and project Node/pnpm selection. Native shims supplement full interactive activation; early mise policy preserves but ignores retired global asdf selectors. **asdf temporarily remains for Python**, pending an attested current release. Legacy Node/Yarn compatibility is no longer a maintenance requirement. No installed runtimes or project files are deleted; Go/Rust/uv remain Brew-owned. See [language cutover](docs/language-runtime-cutover.md) for the migration/upgrade checkpoints and limits. npm stays bundled with the pinned Node.
 
 ### Shell setup
 

@@ -208,20 +208,21 @@ function runtime(args: string[], cwd = repo, extra: Record<string, string> = {})
   });
 }
 
-test.skipIf(!nativeMise)('managed runtime defaults ignore legacy asdf languages and select actual mise executables', () => {
+test.skipIf(!nativeMise)('managed defaults replace retired global asdf selectors without modifying the old file', () => {
   rmSync(join(home, '.zshrc'));
   expect(deploy().exitCode).toBe(0);
   writeFileSync(join(home, '.tool-versions'), 'java adoptopenjdk-21.0.4+7.0.LTS\nkotlin 1.9.25\npython 3.9.19\n');
   const install = runtime(['run', 'runtimes']);
   expect(install.exitCode, install.stderr.toString()).toBe(0);
-  for (const tool of ['node', 'bun']) {
-    const result = runtime(['exec', '--', tool, '-p', 'process.execPath'], home);
+  for (const tool of ['node', 'bun', 'java', 'javac', 'kotlin', 'kotlinc']) {
+    const result = runtime(['which', tool], home);
     expect(result.exitCode, result.stderr.toString()).toBe(0);
-    expect(result.stdout.toString().trim()).toStartWith(join(process.env.MISE_DATA_DIR!, 'installs', tool) + '/');
+    expect(result.stdout.toString().trim()).toStartWith(join(process.env.MISE_DATA_DIR!, 'installs') + '/');
   }
+  expect(readFileSync(join(home, '.tool-versions'), 'utf8')).toBe('java adoptopenjdk-21.0.4+7.0.LTS\nkotlin 1.9.25\npython 3.9.19\n');
 }, 130000);
 
-for (const tool of ['node', 'bun']) {
+for (const tool of ['node', 'bun', 'java', 'kotlin']) {
   test.skipIf(!nativeMise)(`runtime setup rejects an interrupted ${tool} install instead of accepting a PATH fallback`, () => {
     rmSync(join(home, '.zshrc'));
     expect(deploy().exitCode).toBe(0);
@@ -230,59 +231,43 @@ for (const tool of ['node', 'bun']) {
     for (const [name, version] of Object.entries(defaults)) {
       const parent = join(data, 'installs', name);
       mkdirSync(parent, { recursive: true });
-      const copy = Bun.spawnSync(['/bin/cp', '-cR', join(process.env.MISE_DATA_DIR!, 'installs', name, version), parent]);
+      const copy = Bun.spawnSync(['/bin/cp', '-cR', realpathSync(join(process.env.MISE_DATA_DIR!, 'installs', name, version)), join(parent, version)]);
       expect(copy.exitCode).toBe(0);
     }
-    // Preserve mise's installation metadata but remove only our cloned binary.
-    rmSync(join(data, 'installs', tool, defaults[tool], 'bin', tool));
+    // Derive the binary's layout from the public interface, not backend internals.
+    const selected = runtime(['which', tool], home);
+    expect(selected.exitCode).toBe(0);
+    const relative = selected.stdout.toString().trim().slice(process.env.MISE_DATA_DIR!.length + 1);
+    const damaged = join(data, relative);
+    // Never follow an installation symlink back into the original runtime data.
+    expect(realpathSync(damaged)).toStartWith(realpathSync(data) + '/');
+    rmSync(damaged);
     const result = runtime(['run', 'runtimes'], repo, { MISE_DATA_DIR: data });
     expect(result.exitCode, result.stdout.toString() + result.stderr.toString()).not.toBe(0);
     expect(result.stderr.toString()).toContain(`mise install --force ${tool}@${defaults[tool]}`);
   }, 130000);
 }
 
-for (const major of ['16', '18']) {
-  test.skipIf(!nativeMise)(`legacy .nvmrc ${major} selects a mise-owned Node without silently upgrading the project`, () => {
-    rmSync(join(home, '.zshrc'));
-    expect(deploy().exitCode).toBe(0);
-    const project = join(home, 'projects', `node-${major}`);
-    mkdirSync(project, { recursive: true });
-    writeFileSync(join(project, '.nvmrc'), major + '\n');
-    const install = runtime(['install'], project);
-    expect(install.exitCode, install.stderr.toString()).toBe(0);
-    const result = runtime(['exec', '--', 'node', '-p', 'JSON.stringify({version:process.version,path:process.execPath})'], project);
-    expect(result.exitCode, result.stderr.toString()).toBe(0);
-    const actual = JSON.parse(result.stdout.toString());
-    expect(actual.version).toStartWith(`v${major}.`);
-    expect(actual.path).toStartWith(join(process.env.MISE_DATA_DIR!, 'installs/node') + '/');
-    expect(readFileSync(join(project, '.nvmrc'), 'utf8')).toBe(major + '\n');
-  }, 130000);
-}
+test.skipIf(!nativeMise)('native deployment preserves conflicting user-owned early settings before changing home links', () => {
+  rmSync(join(home, '.zshrc'));
+  const early = join(home, '.config/mise/miserc.toml');
+  mkdirSync(dirname(early), { recursive: true });
+  const content = 'ignored_config_paths = ["~/personal/.tool-versions"]\n';
+  writeFileSync(early, content);
+  const result = deploy();
+  expect(result.exitCode).not.toBe(0);
+  expect(readFileSync(early, 'utf8')).toBe(content);
+  expect(existsSync(join(home, '.zshrc'))).toBe(false);
+});
 
-test.skipIf(!nativeMise)('legacy asdf Node/pnpm project keeps its exact versions under mise', () => {
+test.skipIf(!nativeMise)('runtime setup refuses an undeployed early policy rather than adopting retired selectors', () => {
   rmSync(join(home, '.zshrc'));
   expect(deploy().exitCode).toBe(0);
-  const project = join(home, 'projects', 'legacy-asdf');
-  mkdirSync(project, { recursive: true });
-  const versions = 'nodejs 18.14.2\npnpm 7.27.1\n';
-  writeFileSync(join(project, '.tool-versions'), versions);
-  writeFileSync(join(project, '.nvmrc'), '18\n');
-  const install = runtime(['install'], project);
-  expect(install.exitCode, install.stderr.toString()).toBe(0);
-  const node = runtime(['exec', '--', 'node', '-p', 'JSON.stringify({version:process.version,path:process.execPath})'], project);
-  expect(node.exitCode, node.stderr.toString()).toBe(0);
-  const actual = JSON.parse(node.stdout.toString());
-  expect(actual.version).toBe('v18.14.2');
-  expect(actual.path).toStartWith(join(process.env.MISE_DATA_DIR!, 'installs/node') + '/');
-  const pnpm = runtime(['exec', '--', 'pnpm', '--version'], project);
-  expect(pnpm.exitCode, pnpm.stderr.toString()).toBe(0);
-  expect(pnpm.stdout.toString().trim()).toBe('7.27.1');
-  const executable = runtime(['exec', '--', '/bin/sh', '-c', 'command -v pnpm'], project);
-  expect(executable.exitCode).toBe(0);
-  expect(executable.stdout.toString().trim()).toStartWith(join(process.env.MISE_DATA_DIR!, 'installs/pnpm') + '/');
-  expect(readFileSync(join(project, '.tool-versions'), 'utf8')).toBe(versions);
-  expect(readFileSync(join(project, '.nvmrc'), 'utf8')).toBe('18\n');
-}, 130000);
+  rmSync(join(home, '.config/mise/miserc.toml'));
+  const result = runtime(['run', 'runtimes']);
+  expect(result.exitCode).not.toBe(0);
+  expect(result.stderr.toString()).toContain('script/setup first');
+});
 
 test.skipIf(!nativeMise)('runtime setup fails rather than using existing PATH runtimes without our lockfile', () => {
   rmSync(join(home, '.zshrc'));

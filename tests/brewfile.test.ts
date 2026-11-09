@@ -27,7 +27,7 @@ test('mise owns the migrated Node/Bun setup without duplicate bootstrap managers
   expect(formulas).toContain('mise');
   for (const name of ['nvm', 'oven-sh/bun/bun', 'rbenv', 'ruby-build']) expect(formulas).not.toContain(name);
   expect(active.some(item => item.kind === 'tap' && item.name === 'oven-sh/bun')).toBe(false);
-  // Java/Kotlin/Python still have active legacy asdf requirements; not migrated yet.
+  // Python still needs an attested current release before the final asdf cutover.
   expect(formulas).toContain('asdf');
 });
 

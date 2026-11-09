@@ -1,5 +1,5 @@
 # Project tasks and deployment; runtime defaults live in mise/config.toml (installed globally).
-min_version = "2026.11.0"
+min_version = "2026.11.2"
 
 [settings.task]
 run_auto_install = false
@@ -39,7 +39,8 @@ run = [
 [ "${MISE_CACHE_DIR:-}" = "$root/cache" ] &&
 [ "${MISE_STATE_DIR:-}" = "$root/state" ] &&
 [ "$MISE_CONFIG_DIR/config.toml" -ef "{{ config_root }}/mise/config.toml" ] &&
-[ "$MISE_CONFIG_DIR/mise.lock" -ef "{{ config_root }}/mise/mise.lock" ] || {
+[ "$MISE_CONFIG_DIR/mise.lock" -ef "{{ config_root }}/mise/mise.lock" ] &&
+[ "$MISE_CONFIG_DIR/miserc.toml" -ef "{{ config_root }}/mise/miserc.toml" ] || {
   echo "Use a prepared disposable VM with private test directories; see docs/testing.md." >&2
   exit 1
 }
@@ -49,6 +50,7 @@ case "$(uname -s):$(/usr/sbin/sysctl -n hw.model 2>/dev/null)" in
 esac''',
   '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which node >/dev/null',
   '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which bun >/dev/null',
+  'for tool in java javac kotlin kotlinc; do "$DOTFILES_TEST_MISE_BIN" -C "$HOME" which "$tool" >/dev/null || exit; done',
   'bun test',
   'mise run lint',
 ]
@@ -59,7 +61,8 @@ DOTFILES_ITERM_FIRST_LAUNCH = ""
 description = "Install only the reviewed runtime defaults, with a strict lockfile preflight"
 run = [
   '''[ "{{ mise_config_dir }}/config.toml" -ef "{{ config_root }}/mise/config.toml" ] &&
-[ "{{ mise_config_dir }}/mise.lock" -ef "{{ config_root }}/mise/mise.lock" ] || {
+[ "{{ mise_config_dir }}/mise.lock" -ef "{{ config_root }}/mise/mise.lock" ] &&
+[ "{{ mise_config_dir }}/miserc.toml" -ef "{{ config_root }}/mise/miserc.toml" ] || {
   echo "Deploy this checkout's mise config and lockfile with script/setup first." >&2
   exit 1
 }''',
@@ -68,6 +71,8 @@ run = [
   # may then fall back to PATH; `which` must resolve each configured binary.
   'mise -C "$HOME" which node >/dev/null',
   'mise -C "$HOME" which bun >/dev/null',
+  'for tool in java javac kotlin kotlinc; do mise -C "$HOME" which "$tool" >/dev/null || exit; done',
+  'mise -C "$HOME" reshim',
 ]
 
 [tasks.restore-settings]
@@ -117,6 +122,11 @@ permissions = "0600"
 source = "mise/mise.lock"
 mode = "symlink"
 variants = [{ default = true, target = "{{ mise_config_dir }}/mise.lock" }]
+
+[dotfiles.mise-early-settings]
+source = "mise/miserc.toml"
+mode = "symlink"
+variants = [{ default = true, target = "{{ mise_config_dir }}/miserc.toml" }]
 
 [dotfiles.mise-config]
 source = "mise/config.toml"

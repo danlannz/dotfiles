@@ -9,7 +9,7 @@ These changes are on `chore/mise-deployment`, not the host's live checkout. Edit
 3. Register existing Docker/asdf completion directories, then let **Oh My Zsh own the single `compinit` pass**. Keep the existing plugin collection and Agnoster theme.
 4. Load personal aliases/functions, interactive GPG tty information and any existing iTerm/Bun shell integration.
 5. Source a readable regular **`~/.zshrc.local`** if present.
-6. Activate mise **last**, after other PATH writers, so Node/Bun/project pnpm remain mise-owned while asdf continues serving unmigrated languages.
+6. Activate mise **last**, after other PATH writers, so Node/Bun/Java/Kotlin/project pnpm remain mise-owned while asdf temporarily serves Python. Existing mise shims are also available to configured sessions and their children; see [language cutover](language-runtime-cutover.md).
 
 Docker/asdf completion directories are included only when present and before completion initialization. Existing Bun completion code is still loaded after the framework has supplied `compdef`. No second completion initialization is added for it.
 

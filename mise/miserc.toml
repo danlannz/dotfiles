@@ -1,0 +1,4 @@
+# Native early-loading policy. Preserve the old user file for rollback, but do
+# not let its retired asdf defaults override the reviewed mise defaults.
+# Project-local version files still work; legacy Node/Yarn support is not a gate.
+ignored_config_paths = ["~/.tool-versions"]

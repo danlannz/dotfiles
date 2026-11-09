@@ -102,8 +102,8 @@ export REACT_EDITOR=code
 # User-owned device paths/aliases are never deployed or overwritten by setup.
 [[ -f "$HOME/.zshrc.local" && -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
-# Mise owns Node/Bun (and project pnpm). Activate after other PATH writers so
-# legacy asdf shims can still serve Java/Kotlin/Python without taking Node back.
+# Mise owns Node/Bun/Java/Kotlin (and project pnpm). Activate last for tool env;
+# legacy asdf shims temporarily serve Python without taking managed tools back.
 if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 fi

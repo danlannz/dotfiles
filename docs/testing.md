@@ -24,7 +24,7 @@ Tests execute the actual file without an interpreter override and execute the ex
 
 [`.github/workflows/verify.yml`](../.github/workflows/verify.yml) defines push, pull-request and manual checks with read-only repository permissions, SHA-pinned checkout/mise actions, no persisted checkout credentials and a 25-minute deadline. It uses the ARM64 `macos-15` image, with an explicit architecture assertion; Intel execution remains separate.
 
-The mise action installs the tested **2026.11.2** engine and checks its executable against the published release SHA-256. This is a binary integrity check, not independent signature verification. Node/Bun versions are **not duplicated in workflow inputs**: temporary mise config/lock links point to the production declarations, and dependencies are installed with `mise install --locked` plus native executable checks. ShellCheck is installed on the ephemeral runner only if missing. No normal-home dotfile deployment, Brewfile bundle, privileged bootstrap, account/cloud restore or VM/GUI task runs in CI. The last step is the same host-safe `mise run verify` command used locally.
+The mise action installs the tested **2026.11.2** engine and checks its executable against the published release SHA-256. This is a binary integrity check, not independent signature verification. Node/Bun versions are **not duplicated in workflow inputs**: temporary mise config/lock/early-policy links point to the production declarations, and dependencies are installed with `mise install --locked` plus native executable checks. ShellCheck is installed on the ephemeral runner only if missing. No normal-home dotfile deployment, Brewfile bundle, privileged bootstrap, account/cloud restore or VM/GUI task runs in CI. The last step is the same host-safe `mise run verify` command used locally.
 
 The workflow was validated with **actionlint 1.7.12** and a Bun policy test. The public entry-point tests and full VM suite pass on Sequoia ARM64. A real GitHub-hosted workflow run remains pending publishing this branch; a workflow file and local lint are not evidence of a green remote CI run.
 
@@ -36,7 +36,7 @@ Primary references: [mise action inputs/source](https://github.com/jdx/mise-acti
 mise run verify:vm
 ```
 
-This separate task requires Apple-virtualized macOS hardware, explicit `DOTFILES_TEST_ROOT`/`DOTFILES_TEST_MISE_BIN`, a private HOME and matching private mise directories. The private global config/lock must point to this checkout's production `mise/config.toml` and `mise/mise.lock`. Native executable resolution must succeed before tests run. There is no fixed VM UUID, IP, username or cache path in the task.
+This separate task requires Apple-virtualized macOS hardware, explicit `DOTFILES_TEST_ROOT`/`DOTFILES_TEST_MISE_BIN`, a private HOME and matching private mise directories. The private global config/lock/early-policy files must point to this checkout's production `mise/config.toml`, `mise/mise.lock` and `mise/miserc.toml`. Native executable resolution must succeed before tests run. There is no fixed VM UUID, IP, username or cache path in the task.
 
 Prepare the fixture explicitly **inside the disposable guest**, from its reviewed checkout. This example creates only a new private test directory; it is not a replacement bootstrap:
 
@@ -44,11 +44,12 @@ Prepare the fixture explicitly **inside the disposable guest**, from its reviewe
 (
   repo="$(pwd -P)"
   mise_bin="$(command -v mise)"
-  root="$(mktemp -d "$HOME/Library/Caches/dotfiles-tests.XXXXXX")"
+  root="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-tests.XXXXXX")"
   mkdir -p "$root"/{bin,home,config,data,cache,state}
   ln -s "$mise_bin" "$root/bin/mise"
   ln -s "$repo/mise/config.toml" "$root/config/config.toml"
   ln -s "$repo/mise/mise.lock" "$root/config/mise.lock"
+  ln -s "$repo/mise/miserc.toml" "$root/config/miserc.toml"
   export DOTFILES_TEST_ROOT="$root" DOTFILES_TEST_MISE_BIN="$root/bin/mise"
   export HOME="$root/home" MISE_CONFIG_DIR="$root/config" MISE_DATA_DIR="$root/data"
   export MISE_CACHE_DIR="$root/cache" MISE_STATE_DIR="$root/state"
@@ -57,11 +58,12 @@ Prepare the fixture explicitly **inside the disposable guest**, from its reviewe
 
   "$root/bin/mise" trust "$repo/mise.toml"
   "$root/bin/mise" -C "$HOME" install --locked
-  # Prepare project versions outside the individual tests' bounded deadlines.
-  "$root/bin/mise" -C "$HOME" install node@16 node@18 node@18.14.2 pnpm@7.27.1
+  "$root/bin/mise" -C "$HOME" reshim
   "$root/bin/mise" -C "$repo" run verify:vm
 )
 ```
+
+Keep the fixture HOME outside the real account's HOME so ancestor discovery cannot load that account's unrelated mise configuration. Retired Node/Yarn compatibility fixtures no longer need legacy downloads. JVM tests compile/run small programs, verify `JAVA_HOME`, native shims and strict interrupted-install handling; they do not establish Gradle/IDE or Python application compatibility. See [language cutover](language-runtime-cutover.md).
 
 The VM must already have the font/system prerequisites supplied by the regular Brewfile. Integration tests intentionally exercise native deployment/runtime installers in temporary fixtures; cold fixture caches can require downloads. Preference tests use dedicated synthetic domains, because CFPreferences is tied to the OS user, **not** an overridden HOME. These tests must not run on the host. Existing/default user preferences, account login, cloud restore and whole-machine provisioning are not part of this task.
 

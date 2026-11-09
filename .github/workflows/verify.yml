@@ -54,10 +54,13 @@ jobs:
           mkdir -p "$MISE_CONFIG_DIR" "$MISE_DATA_DIR" "$MISE_CACHE_DIR" "$MISE_STATE_DIR"
           ln -s "$GITHUB_WORKSPACE/mise/config.toml" "$MISE_CONFIG_DIR/config.toml"
           ln -s "$GITHUB_WORKSPACE/mise/mise.lock" "$MISE_CONFIG_DIR/mise.lock"
+          ln -s "$GITHUB_WORKSPACE/mise/miserc.toml" "$MISE_CONFIG_DIR/miserc.toml"
           mise trust "$GITHUB_WORKSPACE/mise.toml"
           mise install --locked
           mise which node
           mise which bun
+          for tool in java javac kotlin kotlinc; do mise which "$tool"; done
+          mise reshim
           command -v shellcheck >/dev/null || brew install shellcheck
 
       - name: Run host-safe tests and lint

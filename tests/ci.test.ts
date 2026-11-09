@@ -23,6 +23,7 @@ test('CI uses pinned read-only actions and ordinary verification, not machine or
   expect(commands).toContain('"$GITHUB_ENV"');
   expect(commands).toContain('mise/config.toml');
   expect(commands).toContain('mise/mise.lock');
+  expect(commands).toContain('mise/miserc.toml');
   expect(commands).toContain('mise install --locked');
   expect(commands).toContain('mise run verify');
   expect(commands).not.toMatch(/\bsudo\b|bootstrap\.sh|script\/setup|verify:vm|terminal-default|restore-settings|brew bundle/);
