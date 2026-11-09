@@ -37,7 +37,7 @@ The migration branch replaces the destructive linker with explicit native mise d
 
 See [safe deployment and runtime cutover](docs/mise-deployment.md) for preview/apply commands, rollback considerations and VM evidence. Those commands apply the invoking checkout to the user's HOME: do not run them on the host just to test a branch.
 
-Mise owns pinned Node/Bun/Java/Kotlin defaults and project Node/pnpm selection. Native shims supplement full interactive activation; early mise policy preserves but ignores retired global asdf selectors. **asdf temporarily remains for Python**, pending an attested current release. Legacy Node/Yarn compatibility is no longer a maintenance requirement. No installed runtimes or project files are deleted; Go/Rust/uv remain Brew-owned. See [language cutover](docs/language-runtime-cutover.md) for the migration/upgrade checkpoints and limits. npm stays bundled with the pinned Node.
+Mise owns pinned **Node/Bun/Java/Kotlin/Python** defaults and project Node/pnpm selection. Native shims supplement full interactive activation; early mise policy preserves but ignores retired global asdf selectors. The asdf provisioning/activation declarations are retired, without uninstalling existing tools. Legacy Node/Yarn compatibility is no longer a maintenance requirement. No installed runtimes or project files are deleted; Go/Rust/uv remain Brew-owned. See [language cutover](docs/language-runtime-cutover.md) for the migration/upgrade checkpoints and limits. npm stays bundled with the pinned Node.
 
 ### Shell setup
 
@@ -45,7 +45,7 @@ The Oh My Zsh installer runs with `--unattended --keep-zshrc`: it preserves exis
 
 Shell/framework, Bun completion, Docker completion, and per-user tool paths use `$HOME`, not a machine-specific account directory. Open a new terminal tab (or run `exec zsh -l`) after updating shell configuration. The managed **Dotfiles** iTerm profile uses 12-point Meslo Nerd Font Mono and the existing dark palette. A new profile-less installation gets a usable default; existing profiles/default choices are preserved. See [terminal setup](docs/terminal-setup.md) for selection, editing and verification limits.
 
-Managed paths and existing Docker/asdf completion directories are available before Oh My Zsh's single completion initialization. GPG agents start on demand, command correction initializes only when used, and optional `~/.zshrc.local` supplies user-owned overrides before final mise activation. SDK/library settings are no longer injected into every shell. See [shell startup and PATH ownership](docs/shell-setup.md) for scope, compatibility and measured guest startup results.
+Managed paths and existing Docker completion directories are available before Oh My Zsh's single completion initialization. GPG agents start on demand, command correction initializes only when used, and optional `~/.zshrc.local` supplies user-owned overrides before final mise activation. SDK/library settings are no longer injected into every shell. See [shell startup and PATH ownership](docs/shell-setup.md) for scope, compatibility and measured guest startup results.
 
 ### iTerm profile
 

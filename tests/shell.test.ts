@@ -192,7 +192,7 @@ test('an ignored home-local override keeps user aliases and paths and loads befo
   expect(ignored.exitCode).toBe(0);
 });
 
-test('framework completion initialization sees managed paths and Docker/asdf completions and runs only once', () => {
+test('framework completion initialization sees managed paths and Docker completions once without retired asdf paths', () => {
   for (const path of ['.docker/completions', '.asdf/completions', '.local/bin']) mkdirSync(join(home, path), { recursive: true });
   writeFileSync(join(home, '.local/bin/gdircolors'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
   framework('FRAMEWORK_FPATH="${(j.:.)fpath}"\nFRAMEWORK_TOOL="$(command -v gdircolors)"');
@@ -200,6 +200,6 @@ test('framework completion initialization sees managed paths and Docker/asdf com
   expect(result.exitCode, result.stderr.toString()).toBe(0);
   expect(result.stdout.toString()).toContain('INIT=1\n');
   expect(result.stdout.toString()).toContain(join(home, '.docker/completions'));
-  expect(result.stdout.toString()).toContain(join(home, '.asdf/completions'));
+  expect(result.stdout.toString()).not.toContain(join(home, '.asdf/completions'));
   expect(result.stdout.toString()).toContain(`TOOL=${home}/.local/bin/gdircolors`);
 });

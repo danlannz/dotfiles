@@ -59,7 +59,7 @@ jobs:
           mise install --locked
           mise which node
           mise which bun
-          for tool in java javac kotlin kotlinc; do mise which "$tool"; done
+          for tool in java javac kotlin kotlinc python python3; do mise which "$tool"; done
           mise reshim
           command -v shellcheck >/dev/null || brew install shellcheck
 

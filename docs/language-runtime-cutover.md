@@ -2,6 +2,10 @@
 
 This implementation stays on the isolated `chore/mise-deployment` worktree. It has **not** been rolled out to the host. Old runtime installations, global packages, project files, registered JDKs and application-owned runtimes are not deleted or overwritten.
 
+## Current status
+
+Both checkpoints are implemented and VM-verified. **`967d51b`** preserves the migration-only Java/Kotlin state. The subsequent upgrade uses Java **21.0.13+9**, Kotlin **2.4.21**, and Python **3.15.2**; Node 26.13.0/Bun 1.4.4 stay unchanged. The asdf installation declaration, OMZ plugin and completion-path integration are now removed **on this branch only**. No `brew uninstall`, runtime-directory pruning, host activation or project-file rewrite was performed.
+
 ## Checkpoint 1 — Java/Kotlin migration without a version upgrade
 
 Production mise config/lock now supply:
@@ -47,8 +51,24 @@ Native dot deployment emitted warnings when inspecting non-runtime configuration
 
 Private evidence/backups: `~/Library/Caches/dotfiles-vm/last-language-migration.path`.
 
-## Next checkpoint — upgrades
+## Checkpoint 2 — upgrades and verified Python adoption
 
-Upgrade Java within **Java 21 LTS** to keep the existing Gradle 8.13 runtime contract; Java 25 would require a separately approved project-build upgrade. Resolve and pin current stable Kotlin/Python through native mise metadata, generate platform locks without weakening verification, then rerun interpreter/compiler/venv/shim/PTY checks before retiring asdf declarations. This is not a request to restore every package from the old global Python environment.
+Native mise metadata resolved these exact targets on 2026-11-09:
+
+| Tool | Upgraded pin | Acceptance |
+| --- | --- | --- |
+| Java | temurin-21.0.13+9.0.LTS | `java`, `javac`, native `JAVA_HOME`, Java/Kotlin compile/run and native shims |
+| Kotlin | 2.4.21 | Compiler/launcher under the selected JDK; no Gradle plugin edits |
+| Python | 3.15.2 | `python`/`python3`, executable provenance, stdlib native-library imports and independent venv |
+
+Java stays within **Java 21 LTS** to preserve the existing Gradle 8.13 runtime contract; Java 25 would require a separate project-build upgrade. This is a security-patch upgrade, not a silent JDK-major change.
+
+Python uses the native `core:python` backend with **`compile = false` and `github_attestations = true`**. Generated ARM64 and Intel lock entries both record `provenance = "github-attestations"` and SHA-256 checksums. The old 3.9.19 rejection was not bypassed. As explicitly approved, Python's owner/version changes occur together in this checkpoint. No old pip environment is copied or restored into it.
+
+Current verification is **102 host passes /51 integration skips**, **152 VM passes /one GUI skip**. Native tests cover SSL, SQLite, ctypes, zlib and decimal imports, venv isolation without network/package installation, compiler execution, shell environment and native shims. Python now has its own failed-before-fix interrupted-install regression; strict setup checks `python` and `python3` along with the other required executables.
+
+The actual disposable-account `runtimes` task also installed the upgraded defaults in its normal mise data directory, not just the private test data. Real rc/OMZ/Agnoster PTY checks passed with both private and normal guest runtime data. Existing asdf installations are not uninstalled. Mise printed optional system-JDK registration instructions, but **no sudo/JavaVirtualMachines registration commands were executed**.
+
+These are interpreter/compiler/venv and shell acceptance checks, not evidence that old Python applications, Android/Gradle builds, IDE discovery or all third-party packages support the new versions. Those consumers need their own tests if revived. The earlier ownership inventory remains a historical snapshot; standalone CLI reproduction and host/publication gates are still open.
 
 References: [mise early settings](https://mise.jdx.dev/configuration/settings.html), [shims](https://mise.jdx.dev/dev-tools/shims.html), [Java](https://mise.jdx.dev/lang/java.html), [Python](https://mise.jdx.dev/lang/python.html), [Gradle 8.13 compatibility](https://docs.gradle.org/8.13/userguide/compatibility.html), and the [read-only ownership inventory](runtime-package-ownership.md).

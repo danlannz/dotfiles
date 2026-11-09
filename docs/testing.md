@@ -24,7 +24,7 @@ Tests execute the actual file without an interpreter override and execute the ex
 
 [`.github/workflows/verify.yml`](../.github/workflows/verify.yml) defines push, pull-request and manual checks with read-only repository permissions, SHA-pinned checkout/mise actions, no persisted checkout credentials and a 25-minute deadline. It uses the ARM64 `macos-15` image, with an explicit architecture assertion; Intel execution remains separate.
 
-The mise action installs the tested **2026.11.2** engine and checks its executable against the published release SHA-256. This is a binary integrity check, not independent signature verification. Node/Bun versions are **not duplicated in workflow inputs**: temporary mise config/lock/early-policy links point to the production declarations, and dependencies are installed with `mise install --locked` plus native executable checks. ShellCheck is installed on the ephemeral runner only if missing. No normal-home dotfile deployment, Brewfile bundle, privileged bootstrap, account/cloud restore or VM/GUI task runs in CI. The last step is the same host-safe `mise run verify` command used locally.
+The mise action installs the tested **2026.11.2** engine and checks its executable against the published release SHA-256. This is a binary integrity check, not independent signature verification. Runtime versions are **not duplicated in workflow inputs**: temporary mise config/lock/early-policy links point to the production declarations, and dependencies are installed with `mise install --locked` plus native executable checks. ShellCheck is installed on the ephemeral runner only if missing. No normal-home dotfile deployment, Brewfile bundle, privileged bootstrap, account/cloud restore or VM/GUI task runs in CI. The last step is the same host-safe `mise run verify` command used locally.
 
 The workflow was validated with **actionlint 1.7.12** and a Bun policy test. The public entry-point tests and full VM suite pass on Sequoia ARM64. A real GitHub-hosted workflow run remains pending publishing this branch; a workflow file and local lint are not evidence of a green remote CI run.
 
@@ -63,7 +63,7 @@ Prepare the fixture explicitly **inside the disposable guest**, from its reviewe
 )
 ```
 
-Keep the fixture HOME outside the real account's HOME so ancestor discovery cannot load that account's unrelated mise configuration. Retired Node/Yarn compatibility fixtures no longer need legacy downloads. JVM tests compile/run small programs, verify `JAVA_HOME`, native shims and strict interrupted-install handling; they do not establish Gradle/IDE or Python application compatibility. See [language cutover](language-runtime-cutover.md).
+Keep the fixture HOME outside the real account's HOME so ancestor discovery cannot load that account's unrelated mise configuration. Retired Node/Yarn compatibility fixtures no longer need legacy downloads. Runtime tests compile/run small JVM programs, verify `JAVA_HOME`, native shims, attested Python policy, Python native-library imports/venv isolation and strict interrupted-install handling; they do not establish Gradle/IDE or Python application compatibility. See [language cutover](language-runtime-cutover.md).
 
 The VM must already have the font/system prerequisites supplied by the regular Brewfile. Integration tests intentionally exercise native deployment/runtime installers in temporary fixtures; cold fixture caches can require downloads. Preference tests use dedicated synthetic domains, because CFPreferences is tied to the OS user, **not** an overridden HOME. These tests must not run on the host. Existing/default user preferences, account login, cloud restore and whole-machine provisioning are not part of this task.
 
@@ -83,7 +83,7 @@ This explicitly opens iTerm normally and checks automatic default selection and 
 
 Shell fixtures source the actual managed rc/path/functions in temporary homes, with external framework/tool boundaries replaced. They cover one completion pass, early path/fpath availability, absent optional tools, lazy correction initialization/failure, tty-aware GPG, inherited settings, guarded SDK/Go/Homebrew paths and the ignored local override. PTY tests do not source the developer's live rc or invoke its GPG tools.
 
-The real guest rc/Oh My Zsh was separately measured before/after with the same PTY protocol, and a functional PTY check preserves Agnoster/fzf and mise Node/Bun provenance/switching. Timing instrumentation stays outside Git and production startup. See [shell setup](shell-setup.md) for the measurements and scope; they are not a universal performance threshold or an iTerm GUI assertion.
+The real guest rc/Oh My Zsh was separately measured before/after with the same PTY protocol, and a functional PTY check preserves Agnoster/fzf and mise Node/Bun provenance/switching. Latest real-shell language checks additionally verify the upgraded Java/Kotlin/Python defaults with both private and normal guest runtime data. Timing instrumentation stays outside Git and production startup. See [shell setup](shell-setup.md) for the measurements and scope; they are not a universal performance threshold or an iTerm GUI assertion.
 
 ## Historical pilot
 

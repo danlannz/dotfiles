@@ -54,9 +54,8 @@ ZSH_THEME="agnoster" # "powerlevel9k/powerlevel9k" # "robbyrussell"
 [[ -s "$HOME/.path" ]] && source "$HOME/.path"
 
 # Oh My Zsh owns compinit. Register completion directories before its one pass.
-[[ -d "$HOME/.asdf/completions" ]] && fpath=("$HOME/.asdf/completions" $fpath)
 [[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
-plugins=(bundler git node npm macos web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf doctl asdf)
+plugins=(bundler git node npm macos web-search zsh-dircolors-solarized zsh-syntax-highlighting zsh-autosuggestions fzf doctl)
 
 source "$ZSH/oh-my-zsh.sh"
 
@@ -102,8 +101,8 @@ export REACT_EDITOR=code
 # User-owned device paths/aliases are never deployed or overwritten by setup.
 [[ -f "$HOME/.zshrc.local" && -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
-# Mise owns Node/Bun/Java/Kotlin (and project pnpm). Activate last for tool env;
-# legacy asdf shims temporarily serve Python without taking managed tools back.
+# Mise owns Node/Bun/Java/Kotlin/Python (and project pnpm). Full activation
+# supplies JAVA_HOME and runtime environment after all other PATH writers.
 if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 fi

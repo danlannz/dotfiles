@@ -20,37 +20,37 @@ checksum = "sha256:d4a155adfbfd09155eb3ba05c9e3a544f39297d7a68616d3c7759f67ab5c4
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-darwin-x64-baseline.zip"
 
 [[tools.java]]
-version = "temurin-21.0.4+7.0.LTS"
+version = "temurin-21.0.13+9.0.LTS"
 backend = "core:java"
-specifiers = ["temurin-21.0.4+7.0.LTS"]
+specifiers = ["temurin-21.0.13+9.0.LTS"]
 
 [tools.java."platforms.macos-arm64"]
-checksum = "sha256:dcf69a21601d9b1b25454bbad4f0f32784bb42cdbe4063492e15a851b74cb61e"
-url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.4%2B7/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.4_7.tar.gz"
+checksum = "sha256:bf036b35b071bfb2f54f2c0af8ee8d88afa95ee6eb3dce02c0f94cfc2524d04a"
+url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.13_9.tar.gz"
 
 [tools.java."platforms.macos-x64"]
-checksum = "sha256:e368e5de7111aa88e6bbabeff6f4c040772b57fb279cc4e197b51654085bbc18"
-url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.4%2B7/OpenJDK21U-jdk_x64_mac_hotspot_21.0.4_7.tar.gz"
+checksum = "sha256:9aa1d1c17ae5467a022679e7e0af5c00797d94ac462ed1a46f4db07a8a34a6dd"
+url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_x64_mac_hotspot_21.0.13_9.tar.gz"
 
 [[tools.kotlin]]
-version = "1.9.25"
+version = "2.4.21"
 backend = "github:JetBrains/kotlin"
-specifiers = ["1.9.25"]
+specifiers = ["2.4.21"]
 
 [tools.kotlin.options]
 asset_pattern = "kotlin-compiler-*.zip"
 
 [tools.kotlin."platforms.macos-arm64"]
-checksum = "sha256:6ab72d6144e71cbbc380b770c2ad380972548c63ab6ed4c79f11c88f2967332e"
+checksum = "sha256:7cc140e76daf416a0424a5557f99afd7ca89ebd463ea1101261e3e01c33e75cd"
 checksum_source = "mise-versions"
-url = "https://github.com/JetBrains/kotlin/releases/download/v1.9.25/kotlin-compiler-1.9.25.zip"
-url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/180333072"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.4.21/kotlin-compiler-2.4.21.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/621287401"
 
 [tools.kotlin."platforms.macos-x64"]
-checksum = "sha256:6ab72d6144e71cbbc380b770c2ad380972548c63ab6ed4c79f11c88f2967332e"
+checksum = "sha256:7cc140e76daf416a0424a5557f99afd7ca89ebd463ea1101261e3e01c33e75cd"
 checksum_source = "mise-versions"
-url = "https://github.com/JetBrains/kotlin/releases/download/v1.9.25/kotlin-compiler-1.9.25.zip"
-url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/180333072"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.4.21/kotlin-compiler-2.4.21.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/621287401"
 
 [[tools.node]]
 version = "26.13.0"
@@ -64,3 +64,18 @@ url = "https://nodejs.org/dist/v26.13.0/node-v26.13.0-darwin-arm64.tar.gz"
 [tools.node."platforms.macos-x64"]
 checksum = "sha256:525c9b29bb0263d687de60a4cec0e2a6db876a8eb032369e5795eca71e7c358e"
 url = "https://nodejs.org/dist/v26.13.0/node-v26.13.0-darwin-x64.tar.gz"
+
+[[tools.python]]
+version = "3.15.2"
+backend = "core:python"
+specifiers = ["3.15.2"]
+
+[tools.python."platforms.macos-arm64"]
+checksum = "sha256:1b1b03fca8aa351698403f3d100ee83db7a5d99748fc7707681ac31a6a846ad9"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.15.2+20261026-aarch64-apple-darwin-install_only_stripped.tar.gz"
+provenance = "github-attestations"
+
+[tools.python."platforms.macos-x64"]
+checksum = "sha256:6ec04346b578656b5d5597144cbe0f4773acea6af6048cb8fe0cac3e92c702ac"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.15.2+20261026-x86_64-apple-darwin-install_only_stripped.tar.gz"
+provenance = "github-attestations"

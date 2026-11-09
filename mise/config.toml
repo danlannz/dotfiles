@@ -7,13 +7,18 @@ locked = true
 [tools]
 node = "26.13.0"
 bun = "1.4.4"
-java = "temurin-21.0.4+7.0.LTS"
-kotlin = "1.9.25"
+java = "temurin-21.0.13+9.0.LTS"
+kotlin = "2.4.21"
+python = "3.15.2"
 
 [settings]
 lockfile = true
 lockfile_platforms = ["macos-arm64", "macos-x64"]
 idiomatic_version_file_enable_tools = ["node"]
-# Python remains asdf-owned until an attested current release is adopted.
-# Go/Rust/uv/CocoaPods remain Brew-owned.
-enable_tools = ["node", "nodejs", "bun", "pnpm", "java", "kotlin"]
+# Go/Rust/uv/CocoaPods remain Brew-owned; do not adopt every installed tool.
+enable_tools = ["node", "nodejs", "bun", "pnpm", "java", "kotlin", "python"]
+
+[settings.python]
+# Require an attested prebuilt interpreter, not a silent source-build fallback.
+compile = false
+github_attestations = true

@@ -9,7 +9,6 @@ end
 
 brew "ack"                                                       # Programmer-oriented text search
 brew "agent-browser"                                             # Browser automation CLI for AI agents
-brew "asdf"                                                      # Python retained temporarily; Java/Kotlin/Node/Bun use mise
 brew "automake"                                                  # Generate GNU-compatible Makefiles
 brew "awscli"                                                    # Amazon Web Services command-line interface
 brew "bat"                                                       # Display files with syntax highlighting and Git integration

@@ -50,7 +50,7 @@ case "$(uname -s):$(/usr/sbin/sysctl -n hw.model 2>/dev/null)" in
 esac''',
   '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which node >/dev/null',
   '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which bun >/dev/null',
-  'for tool in java javac kotlin kotlinc; do "$DOTFILES_TEST_MISE_BIN" -C "$HOME" which "$tool" >/dev/null || exit; done',
+  'for tool in java javac kotlin kotlinc python python3; do "$DOTFILES_TEST_MISE_BIN" -C "$HOME" which "$tool" >/dev/null || exit; done',
   'bun test',
   'mise run lint',
 ]
@@ -71,7 +71,7 @@ run = [
   # may then fall back to PATH; `which` must resolve each configured binary.
   'mise -C "$HOME" which node >/dev/null',
   'mise -C "$HOME" which bun >/dev/null',
-  'for tool in java javac kotlin kotlinc; do mise -C "$HOME" which "$tool" >/dev/null || exit; done',
+  'for tool in java javac kotlin kotlinc python python3; do mise -C "$HOME" which "$tool" >/dev/null || exit; done',
   'mise -C "$HOME" reshim',
 ]
 

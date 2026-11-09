@@ -2,7 +2,7 @@
 
 Read-only inventory and proposal, **2026-11-09 UTC**, after `623fdbe`. No installation, removal, runtime/provider change, project rewrite, service restart, account authentication or host rollout is part of this checkpoint.
 
-**Subsequent decision:** the user retired legacy Node/Yarn compatibility and approved mise language migration plus upgrades. [Language cutover](language-runtime-cutover.md) records the implementation, including Java/Kotlin's migration-only checkpoint and Python's old-artifact attestation gate. The inventory/recommendations below remain the historical discovery snapshot, not the current ownership authority.
+**Subsequent decision:** the user retired legacy Node/Yarn compatibility and approved mise language migration plus upgrades. [Language cutover](language-runtime-cutover.md) records the implementation, including Java/Kotlin's migration-only checkpoint, upgrades, and verified current Python adoption without bypassing the old-artifact attestation gate. The inventory/recommendations below remain the historical discovery snapshot, not the current ownership authority.
 
 ## Recommendation
 

@@ -1,6 +1,6 @@
 # Safe deployment and runtime cutover
 
-This records the runtime/deployment checkpoint committed as `91766ce`. The subsequent [terminal follow-up](terminal-setup.md) adds an editable profile seed and conservative preference stage; the counts below describe this checkpoint, not the expanded suite.
+This records the runtime/deployment checkpoint committed as `91766ce`. The subsequent [terminal follow-up](terminal-setup.md) adds an editable profile seed and conservative preference stage; the counts below describe this checkpoint, not the expanded suite. Current Java/Kotlin/Python ownership, versions, native shim policy and retired legacy compatibility are recorded in [language cutover](language-runtime-cutover.md); the older ownership table below is historical.
 ## Status and ownership
 
 Implemented on the isolated `chore/mise-deployment` worktree, not applied to the host. The host's startup-file symlinks still point into the original checkout. Tests that use actual mise run only in the disposable ARM macOS guest, with a private HOME/config/cache/state and mise-owned runtime data.

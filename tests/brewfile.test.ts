@@ -22,13 +22,11 @@ test('the Brewfile does not explicitly tap built-in or retired Homebrew sources'
   }
 });
 
-test('mise owns the migrated Node/Bun setup without duplicate bootstrap managers', () => {
+test('mise owns the reviewed runtimes without duplicate bootstrap managers', () => {
   const formulas = active.filter(item => item.kind === 'brew').map(item => item.name);
   expect(formulas).toContain('mise');
-  for (const name of ['nvm', 'oven-sh/bun/bun', 'rbenv', 'ruby-build']) expect(formulas).not.toContain(name);
+  for (const name of ['nvm', 'oven-sh/bun/bun', 'rbenv', 'ruby-build', 'asdf']) expect(formulas).not.toContain(name);
   expect(active.some(item => item.kind === 'tap' && item.name === 'oven-sh/bun')).toBe(false);
-  // Python still needs an attested current release before the final asdf cutover.
-  expect(formulas).toContain('asdf');
 });
 
 test('every tool, including optional declarations, has an inline description', () => {

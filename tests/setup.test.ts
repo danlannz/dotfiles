@@ -214,7 +214,7 @@ test.skipIf(!nativeMise)('managed defaults replace retired global asdf selectors
   writeFileSync(join(home, '.tool-versions'), 'java adoptopenjdk-21.0.4+7.0.LTS\nkotlin 1.9.25\npython 3.9.19\n');
   const install = runtime(['run', 'runtimes']);
   expect(install.exitCode, install.stderr.toString()).toBe(0);
-  for (const tool of ['node', 'bun', 'java', 'javac', 'kotlin', 'kotlinc']) {
+  for (const tool of ['node', 'bun', 'java', 'javac', 'kotlin', 'kotlinc', 'python', 'python3']) {
     const result = runtime(['which', tool], home);
     expect(result.exitCode, result.stderr.toString()).toBe(0);
     expect(result.stdout.toString().trim()).toStartWith(join(process.env.MISE_DATA_DIR!, 'installs') + '/');
@@ -222,7 +222,7 @@ test.skipIf(!nativeMise)('managed defaults replace retired global asdf selectors
   expect(readFileSync(join(home, '.tool-versions'), 'utf8')).toBe('java adoptopenjdk-21.0.4+7.0.LTS\nkotlin 1.9.25\npython 3.9.19\n');
 }, 130000);
 
-for (const tool of ['node', 'bun', 'java', 'kotlin']) {
+for (const tool of ['node', 'bun', 'java', 'kotlin', 'python']) {
   test.skipIf(!nativeMise)(`runtime setup rejects an interrupted ${tool} install instead of accepting a PATH fallback`, () => {
     rmSync(join(home, '.zshrc'));
     expect(deploy().exitCode).toBe(0);
