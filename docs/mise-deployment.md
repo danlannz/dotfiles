@@ -16,7 +16,7 @@ Implemented on the isolated `chore/mise-deployment` worktree, not applied to the
 | Agent collection, instructions and five shared links | Existing `agents/setup.ts` and native skill lockfile; mise only supplies Bun/Bunx and task ordering. |
 | Cloud restoration | Explicit `restore-settings` task; never part of default deployment or shell setup. |
 
-Mise's native `enable_tools` setting limits this stage to Node/Nodejs, Bun and pnpm. It will not accidentally adopt the Java/Kotlin/Python versions in the existing global `.tool-versions`, or other installed language toolchains. Expand that allowlist only as their migrations are verified.
+Mise's native `enable_tools` setting limits this stage to Node/Nodejs, Bun and pnpm. It will not accidentally adopt the Java/Kotlin/Python versions in the existing global `.tool-versions`, or other installed language toolchains. Expand that allowlist only as their migrations are verified. The subsequent [runtime/package inventory](runtime-package-ownership.md) records the remaining language/global-CLI consumers and newly discovered Node 14/Yarn/Bun requirements; those are not covered by this checkpoint's Node 16/18 acceptance.
 
 The Brewfile adds `mise` and removes `nvm`, direct Brew Bun, the now-unneeded Bun tap and `ruby-build`. There was no rbenv declaration. The Ruby audit found no `.ruby-version` files in the development tree or global config, and no installed rbenv versions. This is removal of unused **installation declarations**, not a claim of Ruby migration or an uninstall. Existing NVM/asdf/rbenv directories, global packages and runtime installations remain untouched.
 

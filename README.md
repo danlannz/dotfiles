@@ -71,6 +71,6 @@ Native integrations use the separate `mise run verify:vm` task in a prepared dis
 
 The [living backlog](docs/modernisation-backlog.md) tracks the original audit, completed fixes, remaining safety/UX work and the mise adoption sequence. Original VS Code, credential-management and macOS-defaults TODOs are retained there.
 
-See the [original audit](docs/dotfiles-audit.md), [mise fit review](docs/mise-fit-review.md), and [VM results](docs/utm-bootstrap-results.md) for evidence and limits.
+See the [original audit](docs/dotfiles-audit.md), [mise fit review](docs/mise-fit-review.md), and [VM results](docs/utm-bootstrap-results.md) for evidence and limits. The [remaining runtime/package ownership inventory](docs/runtime-package-ownership.md) records local requirements, global CLI gaps and proposed optional boundaries without changing installed tools.
 
 The [original isolated pilot](mise/pilot/README.md) and its [results](docs/mise-pilot-results.md) record the first Node/Bun/task experiment. The subsequent [deployment implementation](docs/mise-deployment.md) adds native file deployment and runtime cutover on an isolated worktree. Neither has been applied to the host merely by editing/testing the branch.
