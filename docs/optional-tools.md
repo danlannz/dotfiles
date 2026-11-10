@@ -43,6 +43,10 @@ An explicit **absolute `GIT_FUZZY_BIN=/path/to/checkout/bin`** selects another c
 
 This is not a generic repository manager or a second package manifest. No authentication, global Git-config modification or user-project command is part of provisioning. Git-fuzzy itself can perform Git mutations and source project configuration when you subsequently use it; run it only in trusted repositories.
 
+## User-activated runtime follow-up
+
+After the user manually activated Yabai in the guest, a [live runtime check](yabai-runtime-acceptance.md) passed automatic tiling, direct focus/swap and full fixture teardown/restoration without restarting the service. It also confirmed **two unsupported active Yabai config commands**, including an ineffective auto-balance setting. skhd was not running; hotkey acceptance and the duplicate binding remain open. Binary provisioning success is not complete desktop/config acceptance.
+
 ## Verification and limits
 
 Host-safe tests exercise the public installer commands with controlled Homebrew/network boundaries and real local Git fixtures: repeat runs, preserved dirty/different-revision checkouts, filesystem conflicts, interrupted checkout, custom bin paths, native declarations, installation failures and opt-in separation. No host package installation or service integration is part of these tests.
@@ -51,6 +55,6 @@ Separately, the disposable Sequoia ARM64 guest ran the **actual mise tasks**: fr
 
 Checkpoint suite: **119 host passes /58 opt-in skips**, **176 VM passes /one iTerm GUI skip**, 177 tests in 17 files, plus Bash 3.2/syntax/ShellCheck/Brewfile/actionlint/whitespace checks. Raw evidence is private under the path referenced by `~/Library/Caches/dotfiles-vm/last-optional-tools.path`.
 
-No host rollout, running legacy-service migration, real hotkey/window-management acceptance, permission grants, Intel execution, published bootstrap or hosted-CI success is claimed.
+At the binary-provisioning checkpoint, no host rollout, running legacy-service migration, real hotkey/window-management acceptance, permission grants, Intel execution, published bootstrap or hosted-CI success was claimed. The subsequent live check above establishes only its named Yabai operations; config failures and live hotkeys remain unresolved.
 
 Primary references: [Yabai installation](https://github.com/asmvik/yabai/wiki/Installing-yabai-(latest-release)), [upstream formulas](https://github.com/asmvik/homebrew-formulae), [skhd installation/configuration](https://github.com/asmvik/skhd), [git-fuzzy at the selected revision](https://github.com/bigH/git-fuzzy/tree/36fc08f084a0cabf3e381dbbbce8e3a1a22fbaa4). The reviewed Homebrew Bundle implementation's `formula_installed?`/`no_upgrade` handling supplies the legacy-rack behavior; fresh and repeated current-tap installation were executed, not a host legacy migration.
