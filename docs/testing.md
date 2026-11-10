@@ -65,6 +65,8 @@ Prepare the fixture explicitly **inside the disposable guest**, from its reviewe
 
 Keep the fixture HOME outside the real account's HOME so ancestor discovery cannot load that account's unrelated mise configuration. Retired Node/Yarn compatibility fixtures no longer need legacy downloads. Runtime tests compile/run small JVM programs, verify `JAVA_HOME`, native shims, attested Python policy, Python native-library imports/venv isolation and strict interrupted-install handling; they do not establish Gradle/IDE or Python application compatibility. See [language cutover](language-runtime-cutover.md).
 
+Pi integration also checks the locked standalone executable without PATH Node, native package registration/backups/preservation, SDK extension and prompt discovery/reload, theme discovery in the native config selector, and project settings precedence. A temporary native Node 24 project checks that Pi shell commands retain the modern project runtime; it may download Node 24 into private mise data on a cold cache. This is not a legacy Node compatibility gate. No model requests, authentication or MCP connections are made. See [Pi setup](../agents/pi/README.md) for scope.
+
 The VM must already have the font/system prerequisites supplied by the regular Brewfile. Integration tests intentionally exercise native deployment/runtime installers in temporary fixtures; cold fixture caches can require downloads. Preference tests use dedicated synthetic domains, because CFPreferences is tied to the OS user, **not** an overridden HOME. These tests must not run on the host. Existing/default user preferences, account login, cloud restore and whole-machine provisioning are not part of this task.
 
 After an interrupted download, inspect native `mise which` diagnostics. Repair only the known damaged version in the private test data if necessary; do not erase runtime directories or add deployment `--force` to make tests pass. Tests check actual executable ownership, not just matching versions.
@@ -84,6 +86,10 @@ This explicitly opens iTerm normally and checks automatic default selection and 
 Shell fixtures source the actual managed rc/path/functions in temporary homes, with external framework/tool boundaries replaced. They cover one completion pass, early path/fpath availability, absent optional tools, lazy correction initialization/failure, tty-aware GPG, inherited settings, guarded SDK/Go/Homebrew paths and the ignored local override. PTY tests do not source the developer's live rc or invoke its GPG tools.
 
 The real guest rc/Oh My Zsh was separately measured before/after with the same PTY protocol, and a functional PTY check preserves Agnoster/fzf and mise Node/Bun provenance/switching. Latest real-shell language checks additionally verify the upgraded Java/Kotlin/Python defaults with both private and normal guest runtime data. Timing instrumentation stays outside Git and production startup. See [shell setup](shell-setup.md) for the measurements and scope; they are not a universal performance threshold or an iTerm GUI assertion.
+
+## Latest checkpoint
+
+Pi provisioning/native configuration: **106 host passes /58 opt-in skips**, **163 VM passes /one iTerm GUI skip**, 164 tests across 15 files. Real normal-guest `agents` installation/registration and repeat also pass without changing the curated skill lock. The native Pi config-selector PTY is resource-discovery evidence, not iTerm GUI visual acceptance. Hosted CI/publication and host rollout remain separately gated.
 
 ## Historical pilot
 

@@ -53,9 +53,9 @@ The maintained font cask is in `.Brewfile`; mise seeds native, editable iTerm JS
 
 On an existing installation, select **Dotfiles** in iTerm Settings and set it as default if desired. Or, with iTerm quit, explicitly run `mise -C ~/.dotfiles run terminal-default` from another terminal. Normal setup never changes an existing default or restarts iTerm. These are deployment commands, not commands to run on the host merely to test the worktree.
 
-### Coding-agent skills
+### Coding agents
 
-See [agents/README.md](agents/README.md) for the shared Pi/Claude Code configuration. Custom `local-*` skills are tracked in `agents/skills/`; upstream skills are ignored and restored from the native lockfile. Bootstrap's native mise tasks strictly install the locked runtime defaults before running the existing agent module through managed Bun. The module links both agents, restores missing skills, and validates the collection.
+See [agents/README.md](agents/README.md) for the shared Pi/Claude Code configuration. Custom `local-*` skills are tracked in `agents/skills/`; upstream skills are ignored and restored from the native lockfile. Bootstrap's native mise tasks strictly install the locked runtime defaults before running the existing agent module through managed Bun. The module links both agents, restores missing skills, and validates the collection. Mise also supplies pinned standalone **Pi 1.5.0**; the agents task registers the [native Pi package](agents/pi/README.md) for shared extensions, prompts and themes, while preserving machine-local preferences, credentials and sessions. Add resources using Pi conventions and `/reload`; no second skill inventory or custom settings format is introduced.
 
 ### Cloud settings
 

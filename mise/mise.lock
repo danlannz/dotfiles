@@ -65,6 +65,23 @@ url = "https://nodejs.org/dist/v26.13.0/node-v26.13.0-darwin-arm64.tar.gz"
 checksum = "sha256:525c9b29bb0263d687de60a4cec0e2a6db876a8eb032369e5795eca71e7c358e"
 url = "https://nodejs.org/dist/v26.13.0/node-v26.13.0-darwin-x64.tar.gz"
 
+[[tools.pi]]
+version = "1.5.0"
+backend = "aqua:earendil-works/pi"
+specifiers = ["1.5.0"]
+
+[tools.pi."platforms.macos-arm64"]
+checksum = "sha256:a9bf0d82d58d2a7d337f4ae4171b5fc9ebffe42509527a831364c4b65adf2cdf"
+checksum_source = "mise-versions"
+url = "https://github.com/earendil-works/pi/releases/download/v1.5.0/pi-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/701404873"
+
+[tools.pi."platforms.macos-x64"]
+checksum = "sha256:f41b26cd9a1754abe259e05a421fb33b00936779cb0783c893a6389d1bd2ee0d"
+checksum_source = "mise-versions"
+url = "https://github.com/earendil-works/pi/releases/download/v1.5.0/pi-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/701404866"
+
 [[tools.python]]
 version = "3.15.2"
 backend = "core:python"

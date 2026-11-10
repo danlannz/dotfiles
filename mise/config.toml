@@ -10,13 +10,15 @@ bun = "1.4.4"
 java = "temurin-21.0.13+9.0.LTS"
 kotlin = "2.4.21"
 python = "3.15.2"
+# Native registry binary bundles Pi's runtime; do not adopt an npm-global copy.
+pi = "1.5.0"
 
 [settings]
 lockfile = true
 lockfile_platforms = ["macos-arm64", "macos-x64"]
 idiomatic_version_file_enable_tools = ["node"]
 # Go/Rust/uv/CocoaPods remain Brew-owned; do not adopt every installed tool.
-enable_tools = ["node", "nodejs", "bun", "pnpm", "java", "kotlin", "python"]
+enable_tools = ["node", "nodejs", "bun", "pnpm", "java", "kotlin", "python", "pi"]
 
 [settings.python]
 # Require an attested prebuilt interpreter, not a silent source-build fallback.

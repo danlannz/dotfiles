@@ -50,7 +50,7 @@ case "$(uname -s):$(/usr/sbin/sysctl -n hw.model 2>/dev/null)" in
 esac''',
   '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which node >/dev/null',
   '"$DOTFILES_TEST_MISE_BIN" -C "$HOME" which bun >/dev/null',
-  'for tool in java javac kotlin kotlinc python python3; do "$DOTFILES_TEST_MISE_BIN" -C "$HOME" which "$tool" >/dev/null || exit; done',
+  'for tool in java javac kotlin kotlinc python python3 pi; do "$DOTFILES_TEST_MISE_BIN" -C "$HOME" which "$tool" >/dev/null || exit; done',
   'bun test',
   'mise run lint',
 ]
@@ -71,7 +71,7 @@ run = [
   # may then fall back to PATH; `which` must resolve each configured binary.
   'mise -C "$HOME" which node >/dev/null',
   'mise -C "$HOME" which bun >/dev/null',
-  'for tool in java javac kotlin kotlinc python python3; do mise -C "$HOME" which "$tool" >/dev/null || exit; done',
+  'for tool in java javac kotlin kotlinc python python3 pi; do mise -C "$HOME" which "$tool" >/dev/null || exit; done',
   'mise -C "$HOME" reshim',
 ]
 
@@ -93,9 +93,12 @@ skip_if = 'test "$(uname -s)" != Darwin'
 run = 'osascript -l JavaScript "{{ config_root }}/terminal/setup.js" "$HOME/Library/Application Support/iTerm2/DynamicProfiles/danlannz-dotfiles.json" "{{ config_root }}/terminal/iterm2.json" --make-default'
 
 [tasks.agents]
-description = "Restore and validate the curated shared agent setup using managed Bun"
+description = "Restore shared agents and register the native Pi configuration package"
 depends = ["runtimes"]
-run = 'mise exec -- bun "{{ config_root }}/agents/setup.ts"'
+run = [
+  'mise exec -- bun "{{ config_root }}/agents/setup.ts"',
+  'mise exec -- bun "{{ config_root }}/agents/setup-pi.ts"',
+]
 
 [dotfiles]
 "~/.Brewfile" = { source = ".Brewfile", mode = "symlink" }

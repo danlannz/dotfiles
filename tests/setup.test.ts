@@ -222,7 +222,7 @@ test.skipIf(!nativeMise)('managed defaults replace retired global asdf selectors
   expect(readFileSync(join(home, '.tool-versions'), 'utf8')).toBe('java adoptopenjdk-21.0.4+7.0.LTS\nkotlin 1.9.25\npython 3.9.19\n');
 }, 130000);
 
-for (const tool of ['node', 'bun', 'java', 'kotlin', 'python']) {
+for (const tool of ['node', 'bun', 'java', 'kotlin', 'python', 'pi']) {
   test.skipIf(!nativeMise)(`runtime setup rejects an interrupted ${tool} install instead of accepting a PATH fallback`, () => {
     rmSync(join(home, '.zshrc'));
     expect(deploy().exitCode).toBe(0);

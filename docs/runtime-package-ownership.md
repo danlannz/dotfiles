@@ -4,7 +4,9 @@ Read-only inventory and proposal, **2026-11-09 UTC**, after `623fdbe`. No instal
 
 **Subsequent decision:** the user retired legacy Node/Yarn compatibility and approved mise language migration plus upgrades. [Language cutover](language-runtime-cutover.md) records the implementation, including Java/Kotlin's migration-only checkpoint, upgrades, and verified current Python adoption without bypassing the old-artifact attestation gate. The inventory/recommendations below remain the historical discovery snapshot, not the current ownership authority.
 
-## Recommendation
+**Subsequent Pi implementation:** [Pi setup](../agents/pi/README.md) now supplies pinned 1.5.0 through mise's native standalone-release backend, not `npm:`. Native SDK/resource and project-subprocess tests establish Node-independent Pi execution with modern project Node selection. Old host Bun globals remain untouched; EAS/Cline/MCP and desktop/Git-helper selections remain separate. The historical legacy acceptance proposals below are retired, not new gates.
+
+## Historical recommendation
 
 1. **Keep asdf and its existing installations for now.** Java/Kotlin/Python are selected globally, and Python has application dependencies that an interpreter-only migration would not restore.
 2. **Extend the compatibility inventory before another cutover:** Node 14/Yarn 1 and project Bun requirements were not in the previously verified Node 16/18 matrix. In particular, exact Node 14.17.0 has no official macOS ARM64 archive.
@@ -120,7 +122,7 @@ Current upstream Yabai/skhd repositories redirect from **`koekeishiya` to `asmvi
 
 The checked-in git-fuzzy revision documents fzf **0.21.0+**. Do not substitute a changing upstream HEAD or assume its current requirements match this old checkout. A new pinned choice needs its own compatibility check. [S19]
 
-## Safe next implementation sequence
+## Proposed implementation sequence at inventory time (superseded)
 
 1. **Confirm the standalone CLI and desktop selections.** Pi is the clearest missing fresh-device executable; decide baseline versus optional mobile/cloud/desktop tools. No new inventory format: use native mise tool entries, Brewfiles and project manifests where their ownership belongs.
 2. **Close the expanded project compatibility gates** in private guest fixtures: exact Node 16.13.0, Node 14/Yarn strategy, nested pnpm disagreement, and Bun 1.3.6 policy. Keep original project files byte-identical unless a project-specific change is separately approved.

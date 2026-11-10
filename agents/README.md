@@ -11,6 +11,8 @@ agents/
     local-my-workflow/     # Custom, tracked in Git
   .skill-lock.json         # Native Skills CLI global metadata, tracked
   instructions.md          # Shared personal defaults and workflow policy
+  pi/                     # Native Pi package: extensions/, prompts/, themes/
+  setup-pi.ts             # Guarded native package registration, not a settings merger
   setup.ts
   setup.test.ts
 ```
@@ -39,7 +41,9 @@ Run `/reload` in Pi or start a new Claude session after editing. For discovery d
 
 ## New device
 
-The dotfiles bootstrap uses mise's locked runtime task before running this existing module through managed Bun. It does not replace the curated collection with mise's tool-bundled skill syncing. To run independently with Bun available:
+The complete `mise -C ~/.dotfiles run agents` deployment task supplies locked standalone Pi and registers the [native Pi resource package](pi/README.md), preserving native user settings/state. Its conventional directories are ready for future extensions, prompts and themes; no resources or model/theme/permission defaults are enabled today. The entire Pi agent directory is never linked into Git.
+
+The dotfiles bootstrap uses mise's locked runtime task before running this existing module through managed Bun. It does not replace the curated collection with mise's tool-bundled skill syncing. To run only the existing instructions/skills module independently with Bun available (this does not install Pi or register its package):
 
 ```sh
 bun ~/.dotfiles/agents/setup.ts --dry-run
@@ -50,7 +54,7 @@ Setup validates existing skills and lock metadata, plans missing downloads, crea
 
 Missing downloads resolve **current upstream content unless an explicit ref is recorded**. Hashes in the lockfile are change detectors, not downloadable versions; setup does not verify upstream hashes. Downloads may update the lockfile, so review it afterward. Malformed existing skills fail validation rather than being silently overwritten.
 
-Existing directories/files or conflicting links are renamed to adjacent `*.backup-*` paths, not deleted or merged. Correct links are left alone. Review backups for machine-only skills. Restart agent sessions afterward. Agent applications, credentials, and subagent tooling are configured separately.
+Existing directories/files or conflicting links are renamed to adjacent `*.backup-*` paths, not deleted or merged. Correct links are left alone. Review backups for machine-only skills. Restart agent sessions afterward. Pi's executable/package are supplied by the complete task above. Other agent applications, credentials, and subagent tooling are configured separately.
 
 ## Custom skills: use `local-`
 
