@@ -91,6 +91,8 @@ The real guest rc/Oh My Zsh was separately measured before/after with the same P
 
 Pi provisioning/native configuration: **106 host passes /58 opt-in skips**, **163 VM passes /one iTerm GUI skip**, 164 tests across 15 files. Real normal-guest `agents` installation/registration and repeat also pass without changing the curated skill lock. The native Pi config-selector PTY is resource-discovery evidence, not iTerm GUI visual acceptance. Hosted CI/publication and host rollout remain separately gated.
 
+Optional-tools follow-up: **119 host passes /58 skips**, **176 VM passes /one iTerm GUI skip**, 177 tests/17 files. Ordinary tests use a controlled Brew boundary and real synthetic Git repositories; they never install desktop packages or fetch the real Git helper. Explicit real guest provisioning and PTY-menu checks are recorded in [optional tools](optional-tools.md), not run implicitly by either verification task. Lint now includes both optional installer scripts and `Brewfile.desktop`.
+
 ## Historical pilot
 
 The duplicate pilot TOML/lock and pilot-specific environment names were retired. Its [archived README](../mise/pilot/README.md) and [original results](mise-pilot-results.md) retain the experiment's evidence; Git commit `1831bdf` retains the exact original files. The current tests use the production configuration as the only runtime declaration.

@@ -57,6 +57,10 @@ On an existing installation, select **Dotfiles** in iTerm Settings and set it as
 
 See [agents/README.md](agents/README.md) for the shared Pi/Claude Code configuration. Custom `local-*` skills are tracked in `agents/skills/`; upstream skills are ignored and restored from the native lockfile. Bootstrap's native mise tasks strictly install the locked runtime defaults before running the existing agent module through managed Bun. The module links both agents, restores missing skills, and validates the collection. Mise also supplies pinned standalone **Pi 1.5.0**; the agents task registers the [native Pi package](agents/pi/README.md) for shared extensions, prompts and themes, while preserving machine-local preferences, credentials and sessions. Add resources using Pi conventions and `/reload`; no second skill inventory or custom settings format is introduced.
 
+### Optional desktop and Git tools
+
+After regular bootstrap, explicitly select `mise -C ~/.dotfiles run desktop` for missing Yabai/skhd binaries or `mise -C ~/.dotfiles run git-fuzzy` for the pinned Git helper. Neither runs by default or changes desktop configuration, starts services, grants permissions or replaces existing checkouts. These are provisioning commands, not host-safe branch checks. See [optional tools](docs/optional-tools.md) for preservation rules, manual activation gates and guest evidence.
+
 ### Cloud settings
 
 Default setup defers Mackup restoration so an old backup cannot silently undo the deployed shell settings. After signing in and reviewing the backup, run `mise -C ~/.dotfiles run restore-settings` explicitly. Failures are reported; real account-dependent restoration is not tested in credential-free guests.

@@ -6,6 +6,8 @@ Read-only inventory and proposal, **2026-11-09 UTC**, after `623fdbe`. No instal
 
 **Subsequent Pi implementation:** [Pi setup](../agents/pi/README.md) now supplies pinned 1.5.0 through mise's native standalone-release backend, not `npm:`. Native SDK/resource and project-subprocess tests establish Node-independent Pi execution with modern project Node selection. Old host Bun globals remain untouched; EAS/Cline/MCP and desktop/Git-helper selections remain separate. The historical legacy acceptance proposals below are retired, not new gates.
 
+**Subsequent optional provisioning:** [Optional tools](optional-tools.md) now implements explicit desktop and pinned git-fuzzy tasks on the isolated branch. Current-tap guest installation/repeat and preserved configuration/service snapshots pass; host legacy services remain untouched. Activation/config compatibility and optional cloud/mobile/MCP selections remain separate.
+
 ## Historical recommendation
 
 1. **Keep asdf and its existing installations for now.** Java/Kotlin/Python are selected globally, and Python has application dependencies that an interpreter-only migration would not restore.

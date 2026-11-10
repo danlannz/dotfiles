@@ -8,12 +8,13 @@ run_auto_install = false
 description = "Check shell/Brewfile syntax, ShellCheck errors and Git whitespace without provisioning"
 dir = "{{ config_root }}"
 run = [
-  'for file in bootstrap.sh script/setup script/after-setup script/setup-app-store .path .functions .alias; do bash -n "$file" || exit; done',
+  'for file in bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .path .functions .alias; do bash -n "$file" || exit; done',
   'sh -n .path',
   'zsh -fn .zshrc',
   'ruby -c .Brewfile',
   'ruby -c Brewfile.app-store',
-  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store .path .functions',
+  'ruby -c Brewfile.desktop',
+  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .path .functions',
   'git diff --check',
 ]
 
@@ -74,6 +75,15 @@ run = [
   'for tool in java javac kotlin kotlinc python python3 pi; do mise -C "$HOME" which "$tool" >/dev/null || exit; done',
   'mise -C "$HOME" reshim',
 ]
+
+[tasks.desktop]
+description = "Opt in: install missing Yabai/skhd only; never activate services or alter permissions"
+run = 'bash "{{ config_root }}/script/setup-desktop"'
+
+[tasks.git-fuzzy]
+description = "Opt in: provision pinned git-fuzzy only when absent; preserve existing checkouts"
+# Keep the reviewed existing revision; an upstream upgrade is separate work.
+run = 'bash "{{ config_root }}/script/setup-git-fuzzy" 36fc08f084a0cabf3e381dbbbce8e3a1a22fbaa4'
 
 [tasks.restore-settings]
 description = "Explicit account-dependent Mackup restore; review backups because it can replace deployed settings"

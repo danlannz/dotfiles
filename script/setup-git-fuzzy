@@ -1,0 +1,44 @@
+#!/bin/bash
+# Git-fuzzy only; the exact new-install revision is declared by the mise task.
+set -euo pipefail
+if [ "$#" -ne 1 ] || ! [[ "$1" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "Usage: $0 <full-commit-sha> (normally: mise run git-fuzzy)" >&2
+  exit 2
+fi
+revision="$1"
+bin="${GIT_FUZZY_BIN:-$HOME/.oh-my-zsh/custom/plugins/git-fuzzy/bin}"
+bin="${bin%/}"
+case "$bin" in
+  /*/bin) target="${bin%/bin}" ;;
+  *) echo "GIT_FUZZY_BIN must be an absolute checkout/bin path." >&2; exit 2 ;;
+esac
+for tool in git fzf; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    echo "$tool is required. Run regular bootstrap first." >&2
+    exit 1
+  fi
+done
+if [ -e "$target" ] || [ -L "$target" ]; then
+  # Never adopt an arbitrary directory, ancestor repository or dangling link.
+  if [ -d "$target" ] && [ -x "$bin/git-fuzzy" ] && [ -f "$target/lib/core.sh" ] &&
+    [ "$(git -C "$target" rev-parse --show-toplevel)" = "$(cd "$target" && pwd -P)" ]; then
+    echo "Existing checkout preserved at $target; requested pin applies only to new installations."
+    exit 0
+  fi
+  echo "Existing target is not a ready git-fuzzy checkout: $target. Inspect it manually; nothing was replaced." >&2
+  exit 1
+fi
+if [ -z "${GIT_FUZZY_BIN:-}" ] && [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "Run regular bootstrap first, or choose an explicit GIT_FUZZY_BIN checkout/bin path." >&2
+  exit 1
+fi
+mkdir -p "$(dirname "$target")"
+export GIT_TERMINAL_PROMPT=0
+git clone --no-checkout https://github.com/bigH/git-fuzzy.git "$target"
+git -C "$target" checkout --detach "$revision"
+[ "$(git -C "$target" rev-parse HEAD)" = "$revision" ] &&
+  [ -x "$bin/git-fuzzy" ] && [ -f "$target/lib/core.sh" ] || {
+  echo "Git-fuzzy installation is incomplete at $target; inspect before retrying." >&2
+  exit 1
+}
+echo "Installed git-fuzzy at $revision. Open a new shell to use the existing managed PATH."

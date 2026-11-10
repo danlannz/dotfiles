@@ -1,0 +1,26 @@
+#!/bin/bash
+# Install missing optional desktop binaries only. Activation is a manual stage.
+set -euo pipefail
+if [ "$#" -ne 0 ]; then
+  echo "Usage: $0" >&2
+  exit 2
+fi
+if [ "$(uname -s)" != Darwin ]; then
+  echo "Desktop provisioning requires macOS." >&2
+  exit 1
+fi
+if ! command -v brew >/dev/null 2>&1; then
+  echo "Homebrew is required. Run bootstrap first." >&2
+  exit 1
+fi
+BREWFILE="$(cd "$(dirname "$0")/.." && pwd)/Brewfile.desktop"
+export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
+# An explicit selection must not silently succeed because of inherited skips.
+unset HOMEBREW_BUNDLE_BREW_SKIP
+if brew bundle check --file "$BREWFILE" --no-upgrade; then
+  echo "Desktop tools already installed; existing installations are preserved."
+else
+  brew bundle install --file "$BREWFILE" --no-upgrade
+  brew bundle check --file "$BREWFILE" --no-upgrade
+fi
+echo "No desktop services, configuration or permissions were changed. Review docs/optional-tools.md before manual activation."

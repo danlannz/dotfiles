@@ -1,0 +1,5 @@
+# Explicit opt-in only. No tap-wide trust, service activation or upgrades.
+# Fully-qualified names let Bundle preserve existing legacy-tap Cellar installs
+# without adding/renaming that tap; missing formulae auto-tap the upstream owner.
+brew "asmvik/formulae/yabai", trusted: true, start_service: false, restart_service: false
+brew "asmvik/formulae/skhd", trusted: true, start_service: false, restart_service: false
