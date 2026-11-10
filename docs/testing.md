@@ -93,6 +93,8 @@ Pi provisioning/native configuration: **106 host passes /58 opt-in skips**, **16
 
 Optional-tools follow-up: **119 host passes /58 skips**, **176 VM passes /one iTerm GUI skip**, 177 tests/17 files. Ordinary tests use a controlled Brew boundary and real synthetic Git repositories; they never install desktop packages or fetch the real Git helper. Explicit real guest provisioning and PTY-menu checks are recorded in [optional tools](optional-tools.md), not run implicitly by either verification task. Lint now includes both optional installer scripts and `Brewfile.desktop`.
 
+Fresh desktop/config follow-up: **123 host passes /58 skips**, and **123/58** for ordinary `verify` in the new guest, 181 tests/18 files. Four configuration regressions cover supported/fail-fast Yabai settings, unambiguous habitual shortcuts and centering only floating windows. Separate [fresh GUI acceptance](desktop-fresh-acceptance.md) passes twelve live checks through the running services after manual OS consent; lock guards, temporary idle assertion and explicit native skhd reload prevent false keyboard conclusions. No new ordinary-suite GUI or service activation is introduced. The preceding full VM-suite counts are historical, not a rerun of this fresh-stage checkpoint. Lint now also checks the actual `.yabairc` in POSIX sh and ShellCheck.
+
 ## Historical pilot
 
 The duplicate pilot TOML/lock and pilot-specific environment names were retired. Its [archived README](../mise/pilot/README.md) and [original results](mise-pilot-results.md) retain the experiment's evidence; Git commit `1831bdf` retains the exact original files. The current tests use the production configuration as the only runtime declaration.

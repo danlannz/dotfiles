@@ -10,11 +10,12 @@ dir = "{{ config_root }}"
 run = [
   'for file in bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .path .functions .alias; do bash -n "$file" || exit; done',
   'sh -n .path',
+  'sh -n .yabairc',
   'zsh -fn .zshrc',
   'ruby -c .Brewfile',
   'ruby -c Brewfile.app-store',
   'ruby -c Brewfile.desktop',
-  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .path .functions',
+  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .path .functions .yabairc',
   'git diff --check',
 ]
 

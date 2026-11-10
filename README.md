@@ -59,7 +59,7 @@ See [agents/README.md](agents/README.md) for the shared Pi/Claude Code configura
 
 ### Optional desktop and Git tools
 
-After regular bootstrap, explicitly select `mise -C ~/.dotfiles run desktop` for missing Yabai/skhd binaries or `mise -C ~/.dotfiles run git-fuzzy` for the pinned Git helper. Neither runs by default or changes desktop configuration, starts services, grants permissions or replaces existing checkouts. These are provisioning commands, not host-safe branch checks. See [optional tools](docs/optional-tools.md) for preservation rules, manual activation gates and guest evidence.
+After regular bootstrap, explicitly select `mise -C ~/.dotfiles run desktop` for missing Yabai/skhd binaries or `mise -C ~/.dotfiles run git-fuzzy` for the pinned Git helper. Neither runs by default or changes desktop configuration, starts services, grants permissions or replaces existing checkouts. These are provisioning commands, not host-safe branch checks. See [optional tools](docs/optional-tools.md) for preservation rules and [fresh desktop acceptance](docs/desktop-fresh-acceptance.md) for native config/service setup, the required manual Accessibility step and tested Option–Shift–0/Option–T behavior. Use `skhd --reload` after changing its linked config; mise cannot silently grant macOS Accessibility consent.
 
 ### Cloud settings
 

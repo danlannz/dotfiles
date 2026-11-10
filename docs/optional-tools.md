@@ -22,7 +22,7 @@ Service start/restart options are explicitly false. The script never invokes eit
 **Installation is not activation acceptance.** Before manually starting anything:
 
 - Review existing service labels/binary paths, active configuration and the upstream permission requirements.
-- Review the legacy Yabai options and duplicate skhd `alt - x` binding tracked in **M14**. A version check does not establish config compatibility, layouts or hotkey behavior.
+- Use the reviewed config fixes and preserved shortcuts in [fresh desktop acceptance](desktop-fresh-acceptance.md). A version check alone does not establish layout/hotkey behavior; less-used bindings and multi-display/space operations remain separate.
 - Keep Accessibility approval, Secure Keyboard Entry decisions and any security-sensitive scripting-addition setup explicit. This stage does not require or change SIP or passwordless sudo policy.
 - skhd upstream is in maintenance mode and recommends a separate Zig port for additional development; this task deliberately keeps the selected upstream implementation rather than silently switching providers.
 
@@ -45,7 +45,7 @@ This is not a generic repository manager or a second package manifest. No authen
 
 ## User-activated runtime follow-up
 
-After the user manually activated Yabai in the guest, a [live runtime check](yabai-runtime-acceptance.md) passed automatic tiling, direct focus/swap and full fixture teardown/restoration without restarting the service. It also confirmed **two unsupported active Yabai config commands**, including an ineffective auto-balance setting. skhd was not running; hotkey acceptance and the duplicate binding remain open. Binary provisioning success is not complete desktop/config acceptance.
+The [initial live runtime check](yabai-runtime-acceptance.md) found unsupported Yabai commands and unresolved key collisions. The subsequent [fresh desktop-stage check](desktop-fresh-acceptance.md) fixes those issues and verifies real native deployment, explicit service setup, manual Accessibility approval, tiling/focus/swap, **Option–Shift–0 rebalance** and **Option–T floating/tiling**, including clean teardown and no new daemon errors. Run `skhd --reload` after editing its repository-backed config; do not restart a working daemon merely to load changes. Mise can orchestrate activation commands, but cannot silently grant normal macOS Accessibility consent. The current default desktop task still does not activate services.
 
 ## Verification and limits
 
@@ -55,6 +55,6 @@ Separately, the disposable Sequoia ARM64 guest ran the **actual mise tasks**: fr
 
 Checkpoint suite: **119 host passes /58 opt-in skips**, **176 VM passes /one iTerm GUI skip**, 177 tests in 17 files, plus Bash 3.2/syntax/ShellCheck/Brewfile/actionlint/whitespace checks. Raw evidence is private under the path referenced by `~/Library/Caches/dotfiles-vm/last-optional-tools.path`.
 
-At the binary-provisioning checkpoint, no host rollout, running legacy-service migration, real hotkey/window-management acceptance, permission grants, Intel execution, published bootstrap or hosted-CI success was claimed. The subsequent live check above establishes only its named Yabai operations; config failures and live hotkeys remain unresolved.
+At the binary-provisioning checkpoint, no host rollout, running legacy-service migration, real hotkey/window-management acceptance, permission grants, Intel execution, published bootstrap or hosted-CI success was claimed. The subsequent live check above establishes only its named Yabai operations; the fresh follow-up accepts only its named common keyboard/window operations after manual consent, not every binding or unattended activation.
 
 Primary references: [Yabai installation](https://github.com/asmvik/yabai/wiki/Installing-yabai-(latest-release)), [upstream formulas](https://github.com/asmvik/homebrew-formulae), [skhd installation/configuration](https://github.com/asmvik/skhd), [git-fuzzy at the selected revision](https://github.com/bigH/git-fuzzy/tree/36fc08f084a0cabf3e381dbbbce8e3a1a22fbaa4). The reviewed Homebrew Bundle implementation's `formula_installed?`/`no_upgrade` handling supplies the legacy-rack behavior; fresh and repeated current-tap installation were executed, not a host legacy migration.

@@ -177,7 +177,7 @@ shift + alt - 6 : yabai -m window --space  6; yabai -m space --focus 6
 shift + alt - 7 : yabai -m window --space  7; yabai -m space --focus 7
 shift + alt - 8 : yabai -m window --space  8; yabai -m space --focus 8
 shift + alt - 9 : yabai -m window --space  9; yabai -m space --focus 9
-shift + alt - 0 : yabai -m window --space 10; yabai -m space --focus 10
+# Desktop 10 is deliberately unbound: shift + alt - 0 remains rebalance.
 
 # resize region
 alt + ctrl - h : yabai -m window --resize left:100:0 ; yabai -m window --resize right:-100:0
@@ -207,13 +207,16 @@ alt - d : yabai -m window --toggle zoom-parent
 alt - f : yabai -m window --toggle zoom-fullscreen
 
 # float / unfloat window and center on screen
-alt - t : yabai -m window --toggle float;\
-          yabai -m window --grid 4:4:1:1:2:2
+alt - t : yabai -m window --toggle float && \
+          if yabai -m query --windows --window | jq -e '."is-floating"' >/dev/null; then \
+              yabai -m window --grid 4:4:1:1:2:2; \
+          fi
 
 # change layout of desktop
 #
 alt - e : yabai -m space --layout bsp
-alt - x : yabai -m space --layout float
+# Whole-space float is deliberately unbound: alt - x remains mirror;
+# alt - t toggles an individual window between floating and tiling.
 
 ## monocle-style support
 # via https://github.com/koekeishiya/yabai/issues/83

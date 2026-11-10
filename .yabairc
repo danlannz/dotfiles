@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
+# Stop visibly on a rejected setting/rule; never announce a partial load as success.
+set -e
 
 #
 # for this to work you must configure sudo such that
@@ -46,8 +48,6 @@
 #     mouse_action2                resize         \
 #     mouse_drop_action            swap
 
-#!/usr/bin/env bash
-
 # yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 # sudo yabai --load-sa
 
@@ -67,10 +67,9 @@ yabai -m rule --add app="^zoom.us$" manage=off
 yabai -m rule --add app="^Simulator$" manage=off
 yabai -m rule --add app="choose" title="^$" manage=off
 
-yabai -m config autobalance                   on
+yabai -m config auto_balance                  on
 
-#window_border
-yabai -m config window_border off
+# Yabai 7 has no built-in window_border setting; do not add a border provider implicitly.
 # yabai -m config window_border_width 4
 # yabai -m config active_window_border_color   0xFF88C0D0
 # yabai -m config normal_window_border_color  0x00000000

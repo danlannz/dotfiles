@@ -1,4 +1,6 @@
-# Yabai runtime acceptance — partial
+# Yabai runtime acceptance — initial partial checkpoint
+
+**Follow-up:** [Fresh desktop acceptance](desktop-fresh-acceptance.md) fixes the common config failures and validates Yabai/skhd setup plus the preferred live shortcuts in a new guest after manual Accessibility approval. This page preserves the earlier observations, not current unresolved status.
 
 Follow-up to [optional provisioning](optional-tools.md), on the disposable Sequoia 15.6.1 ARM64 guest. The user manually installed/started the `com.asmvik.yabai` service before this check; the required access was available when the live window operations were tested. Those manual steps are **not** an automated fresh-device activation result.
 
