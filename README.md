@@ -29,7 +29,7 @@ Without `--app-store`, bootstrap installs the regular `.Brewfile` and defers App
 
 The retry uses the separate native `Brewfile.app-store`, checks for missing apps, and does not upgrade existing apps or rerun security settings, linking, or post-install hooks. Failed installs return a failure status; rerunning after sign-in retries missing apps, while a satisfied manifest is a no-op. Current `mas` cannot reliably report account status, so neither command attempts to detect login or handle credentials. Xcode remains conditional on the host macOS version.
 
-The remote command above uses published `master`; these local changes are unavailable there until published.
+The remote command above uses published `master`. Modernisation work is now published on [`chore/mise-deployment`](https://github.com/danlannz/dotfiles/tree/chore/mise-deployment), but is **not merged into `master`**; that command still downloads the older baseline. Branch publication/green CI is not a host rollout or published-master bootstrap acceptance.
 
 ### Deployment and runtime ownership
 

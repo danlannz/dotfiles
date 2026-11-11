@@ -18,7 +18,7 @@ Without mise, `bun test` remains the ordinary regression command. It does not do
 
 Bootstrap now declares `/bin/bash`, and the README's download command explicitly invokes Bash. A failed `curl` must fail the outer command rather than executing an empty installer; optional arguments after the final `--` reach bootstrap unchanged.
 
-Tests execute the actual file without an interpreter override and execute the exact README command with a controlled download. Only OS/package/network boundaries are replaced, with a fail-closed sudo executable if a shell drops the exported mocks. They cover interpreter selection, successful download execution, download failure and argument forwarding. A bare executable invocation with `--unknown` also exits **2** in the disposable macOS guest before privileged work. These checks do **not** validate the unpublished branch through the remote `master` URL, or rerun privileged provisioning on the host.
+Tests execute the actual file without an interpreter override and execute the exact README command with a controlled download. Only OS/package/network boundaries are replaced, with a fail-closed sudo executable if a shell drops the exported mocks. They cover interpreter selection, successful download execution, download failure and argument forwarding. A bare executable invocation with `--unknown` also exits **2** in the disposable macOS guest before privileged work. These checks do **not** validate the feature branch through the remote `master` URL, or rerun privileged provisioning on the host.
 
 ## Continuous integration
 
@@ -26,7 +26,7 @@ Tests execute the actual file without an interpreter override and execute the ex
 
 The mise action installs the tested **2026.11.2** engine and checks its executable against the published release SHA-256. This is a binary integrity check, not independent signature verification. Runtime versions are **not duplicated in workflow inputs**: temporary mise config/lock/early-policy links point to the production declarations, and dependencies are installed with `mise install --locked` plus native executable checks. ShellCheck is installed on the ephemeral runner only if missing. No normal-home dotfile deployment, Brewfile bundle, privileged bootstrap, account/cloud restore or VM/GUI task runs in CI. The last step is the same host-safe `mise run verify` command used locally.
 
-The workflow was validated with **actionlint 1.7.12** and a Bun policy test. The public entry-point tests and full VM suite pass on Sequoia ARM64. A real GitHub-hosted workflow run remains pending publishing this branch; a workflow file and local lint are not evidence of a green remote CI run.
+The workflow was validated with **actionlint 1.7.12** and a Bun policy test. The public entry-point tests and full VM suite pass on Sequoia ARM64. The first [GitHub-hosted run](https://github.com/danlannz/dotfiles/actions/runs/42989876299) now **passed** for published feature commit `75485af1450ecbb524efebf58fd9a74913454602`, including the ARM64 assertion, verified engine, locked dependency installation and ordinary tests/lint. This is hosted verification evidence, not a privileged bootstrap, GUI/account test, published-master acceptance or host rollout. `master` remains unchanged.
 
 Primary references: [mise action inputs/source](https://github.com/jdx/mise-action/tree/5228313ee0372e111a38da051671ca30fc5a96db), [mise 2026.11.2 assets](https://github.com/jdx/mise/releases/tag/v2026.11.2), [runner image/architecture labels](https://github.com/actions/runner-images#available-images).
 
