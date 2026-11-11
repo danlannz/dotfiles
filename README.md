@@ -10,7 +10,7 @@ Run the following command in a terminal to bootstrap a new machine
 /bin/bash -c 'bootstrap="$(curl -fsSL https://raw.githubusercontent.com/danlannz/dotfiles/master/bootstrap.sh)" && /bin/bash -c "$bootstrap" bootstrap.sh "$@"' --
 ```
 
-Bootstrap requires Bash (including macOS's system `/bin/bash`), not POSIX `sh`. The outer Bash command stops if the download fails; the inner Bash runs only a successful download. Optional `--debug` / `--app-store` flags go after the final `--`.
+Bootstrap requires Bash (including macOS's system `/bin/bash`), not POSIX `sh`. The outer Bash command stops if the download fails; the inner Bash runs only a successful download. Optional `--debug` / `--app-store` flags go after the final `--`. Standalone security/update action modes are described below; they do not run full provisioning.
 
 ### App Store apps
 
@@ -38,6 +38,12 @@ The migration branch replaces the destructive linker with explicit native mise d
 See [safe deployment and runtime cutover](docs/mise-deployment.md) for preview/apply commands, rollback considerations and VM evidence. Those commands apply the invoking checkout to the user's HOME: do not run them on the host just to test a branch.
 
 Mise owns pinned **Node/Bun/Java/Kotlin/Python** defaults and project Node/pnpm selection. Native shims supplement full interactive activation; early mise policy preserves but ignores retired global asdf selectors. The asdf provisioning/activation declarations are retired, without uninstalling existing tools. Legacy Node/Yarn compatibility is no longer a maintenance requirement. No installed runtimes or project files are deleted; Go/Rust/uv remain Brew-owned. See [language cutover](docs/language-runtime-cutover.md) for the migration/upgrade checkpoints and limits. npm stays bundled with the pinned Node.
+
+### Bootstrap security and authorization
+
+Normal terminal bootstrap uses **one native sudo authorization**, refreshed only while that run is active and invalidated on exit. It never saves your sudo password in a script/file. Subsequent privileged commands fail rather than prompt again if authorization is lost; platform/account consent can still require separate manual steps.
+
+Security settings and macOS updates are **not changed by default**. Bootstrap reports FileVault/firewall status and lists updates; FileVault setup/recovery and screen-lock choices stay in System Settings. `mise run security-check` is read-only (exit 2 means attention, 1 means unknown/error). `mise run security-apply` explicitly enables only the native firewall; `mise run macos-updates` explicitly requests updates without an automatic restart flag. The equivalent standalone bootstrap flags work before mise exists. Changing stages are separate opt-ins, not host-safe branch checks. See [provisioning security](docs/provisioning-security.md) for scope, headless limitations, legacy recovery files and tested behavior.
 
 ### Shell setup
 

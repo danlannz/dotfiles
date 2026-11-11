@@ -77,6 +77,20 @@ run = [
   'mise -C "$HOME" reshim',
 ]
 
+[tasks.security-check]
+description = "Read-only FileVault/firewall report: exit 2 means manual attention, 1 means unknown/error"
+run = 'bash "{{ config_root }}/bootstrap.sh" --security-check'
+
+[tasks.security-apply]
+description = "Explicitly enable the native firewall only; no FileVault/recovery-key or screen-lock automation"
+raw = true
+run = 'bash "{{ config_root }}/bootstrap.sh" --security-apply'
+
+[tasks.macos-updates]
+description = "Explicit macOS update installation; no automatic restart requested, native owner authorization may be required"
+raw = true
+run = 'bash "{{ config_root }}/bootstrap.sh" --macos-updates'
+
 [tasks.desktop]
 description = "Opt in: install missing Yabai/skhd only; never activate services or alter permissions"
 run = 'bash "{{ config_root }}/script/setup-desktop"'
