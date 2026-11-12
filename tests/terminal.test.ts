@@ -66,6 +66,21 @@ test('the native terminal profile matches the host appearance without exporting 
   expect(JSON.stringify(profile)).not.toContain('/Users/');
 });
 
+test('new iTerm profiles map only Option-Arrow to shell word navigation without changing other Option keys', () => {
+  const profile = JSON.parse(readFileSync(profileURL, 'utf8')).Profiles[0];
+  // iTerm 3.7.7's bundled Natural Text Editing preset supplies these exact entries.
+  expect(profile['Keyboard Map']).toEqual({
+    'f702-0x280000': { Action: 10, Text: 'b' },
+    'f703-0x280000': { Action: 10, Text: 'f' },
+  });
+  expect(profile).not.toHaveProperty('Option Key Sends');
+  expect(profile).not.toHaveProperty('Right Option Key Sends');
+  const bindings = Bun.spawnSync(['/bin/zsh', '-dfc', 'bindkey -M emacs "^[b"; bindkey -M emacs "^[f"'], { stdout: 'pipe', stderr: 'pipe' });
+  expect(bindings.exitCode).toBe(0);
+  expect(bindings.stdout.toString()).toContain('backward-word');
+  expect(bindings.stdout.toString()).toContain('forward-word');
+});
+
 test.skipIf(!nativeMac)('fresh native preferences select the dynamic GUID without creating a conflicting regular profile', () => {
   const result = configure();
   expect(result.exitCode, result.stderr.toString()).toBe(0);

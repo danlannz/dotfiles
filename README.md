@@ -53,9 +53,15 @@ Shell/framework, Bun completion, Docker completion, and per-user tool paths use 
 
 Managed paths and existing Docker completion directories are available before Oh My Zsh's single completion initialization. GPG agents start on demand, command correction initializes only when used, and optional `~/.zshrc.local` supplies user-owned overrides before final mise activation. SDK/library settings are no longer injected into every shell. See [shell startup and PATH ownership](docs/shell-setup.md) for scope, compatibility and measured guest startup results.
 
+### Reviewed macOS defaults
+
+Normal bootstrap now seeds **only missing** reviewed Dock, Finder, mouse/repeat and Simulator preferences. This includes stable Spaces ordering, filename extensions/path bar/list view, and desktop hard-disk/server visibility. Existing values—including false/zero—are preserved. CI skips preference writes; no apps or services restart.
+
+`mise -C ~/.dotfiles run macos-defaults` previews the selection; `macos-defaults-apply` explicitly runs the same seed-only stage outside bootstrap. Do not apply it on the host just to test this branch. See [selected values, preservation and verification limits](docs/macos-defaults.md).
+
 ### iTerm profile
 
-The maintained font cask is in `.Brewfile`; mise seeds native, editable iTerm JSON without replacing custom files or neighbouring profiles. There is no iCloud dependency or unchecked font download.
+The maintained font cask is in `.Brewfile`; mise seeds native, editable iTerm JSON without replacing custom files or neighbouring profiles. There is no iCloud dependency or unchecked font download. Newly seeded profiles map Option–Left/Right to shell word navigation; existing editable copies are preserved and need an explicit user edit to adopt those mappings.
 
 On an existing installation, select **Dotfiles** in iTerm Settings and set it as default if desired. Or, with iTerm quit, explicitly run `mise -C ~/.dotfiles run terminal-default` from another terminal. Normal setup never changes an existing default or restarts iTerm. These are deployment commands, not commands to run on the host merely to test the worktree.
 

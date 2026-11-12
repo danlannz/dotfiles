@@ -2,8 +2,9 @@
 alias xargs='xargs '
 alias ls='gls -ap --color=auto'
 alias ccat='pygmentize -g'
-alias showHiddenFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
-alias hideHiddenFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app'
+# Explicit user actions only; never terminate Finder to refresh its preferences.
+alias showHiddenFiles='defaults write com.apple.finder AppleShowAllFiles -bool true && printf "Hidden-file preference updated; reopen Finder manually if needed.\n"'
+alias hideHiddenFiles='defaults write com.apple.finder AppleShowAllFiles -bool false && printf "Hidden-file preference updated; reopen Finder manually if needed.\n"'
 
 # Applications
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'

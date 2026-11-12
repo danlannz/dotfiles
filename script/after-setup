@@ -39,3 +39,10 @@ printf 'Cloud settings deferred. After signing in and reviewing the backup, run 
 # Keep this independent of the caller's cwd and interactive shell activation.
 mise -C "$ROOT" run agents || exit "$?"
 mise -C "$ROOT" run terminal || exit "$?"
+
+# User-approved defaults: seed absent keys only; never overwrite existing choices.
+if [ -n "${CI:-}" ]; then
+  echo 'macOS preferences skipped in CI; use the macos-defaults task for a read-only preview.'
+else
+  mise -C "$ROOT" run macos-defaults-apply || exit "$?"
+fi

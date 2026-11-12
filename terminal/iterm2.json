@@ -17,6 +17,10 @@
       "Initial Text": "",
       "Bound Hosts": [],
       "Triggers": [],
+      "Keyboard Map": {
+        "f702-0x280000": { "Action": 10, "Text": "b" },
+        "f703-0x280000": { "Action": 10, "Text": "f" }
+      },
       "Ansi 0 Color": { "Red Component": 0, "Green Component": 0.15575926005840302, "Blue Component": 0.1937013864517212 },
       "Ansi 1 Color": { "Red Component": 0.8192697763442993, "Green Component": 0.10840655118227005, "Blue Component": 0.14145714044570923 },
       "Ansi 2 Color": { "Red Component": 0.44977453351020813, "Green Component": 0.5411549210548401, "Blue Component": 0.02020875550806523 },

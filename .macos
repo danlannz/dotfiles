@@ -1,2 +1,83 @@
-# Show touches on iOS simulator
-defaults write com.apple.iphonesimulator ShowSingleTouches 1
+#!/bin/bash
+# Reviewed user preferences only. Never import or replace a whole domain.
+set -eu
+export LC_ALL=C
+
+usage() { echo "Usage: bash $0 [--preview | --apply | --help]"; }
+[ "$#" -le 1 ] || { usage >&2; exit 2; }
+mode=${1:---preview}
+case "$mode" in
+  --preview | --apply) ;;
+  --help) usage; exit 0 ;;
+  *) usage >&2; exit 2 ;;
+esac
+if [ "$mode" = --apply ] && [ -n "${CI:-}" ]; then
+  echo 'Preference writes are disabled in CI; use --preview.' >&2
+  exit 1
+fi
+[ "$(uname -s)" = Darwin ] || { echo 'macOS preferences require macOS.' >&2; exit 1; }
+[ "$(id -u)" -ne 0 ] || { echo 'Run as the intended user, never with sudo/root.' >&2; exit 1; }
+command -v defaults >/dev/null || { echo 'Native defaults is required.' >&2; exit 1; }
+
+preference() {
+  domain=$1 key=$2 type=$3 desired=$4
+  if current=$(defaults read "$domain" "$key" 2>&1); then
+    printf 'Preserve %s %s: %s\n' "$domain" "$key" "$current"
+    return
+  else
+    status=$?
+  fi
+  # Missing keys have a specific native diagnostic. Unknown errors are not absence.
+  if [ "$status" -ne 1 ] || [[ "$current" != *'The domain/default pair of ('*') does not exist'* ]]; then
+    printf 'Cannot read %s %s: %s\n' "$domain" "$key" "$current" >&2
+    exit 1
+  fi
+  if [ "$phase" = preview ]; then
+    printf 'Missing: %s %s (%s %s)\n' "$domain" "$key" "$type" "$desired"
+    return
+  fi
+  case "$type" in
+    -bool) kind=boolean; expected=0; [ "$desired" != true ] || expected=1 ;;
+    -int) kind=integer; expected=$desired ;;
+    -float) kind=float; expected=$desired ;;
+    -string) kind=string; expected=$desired ;;
+    *) echo 'Unsupported reviewed preference type.' >&2; exit 1 ;;
+  esac
+  defaults write "$domain" "$key" "$type" "$desired" || {
+    status=$?; printf 'Cannot write %s %s.\n' "$domain" "$key" >&2; exit "$status"
+  }
+  current=$(defaults read "$domain" "$key") || exit 1
+  actual_type=$(defaults read-type "$domain" "$key") || exit 1
+  if [ "$current" != "$expected" ] || [ "$actual_type" != "Type is $kind" ]; then
+    printf 'Preference verification failed: %s %s.\n' "$domain" "$key" >&2
+    exit 1
+  fi
+  printf 'Seeded %s %s: %s\n' "$domain" "$key" "$current"
+}
+
+# Single authoritative inventory. Existing false/zero/different values survive.
+reviewed_preferences() {
+  preference com.apple.iphonesimulator ShowSingleTouches -bool true
+  preference com.apple.dock autohide -bool true
+  preference NSGlobalDomain com.apple.mouse.scaling -float 2
+  preference NSGlobalDomain KeyRepeat -int 1
+  preference NSGlobalDomain InitialKeyRepeat -int 25
+  preference com.apple.dock mru-spaces -bool false
+  preference NSGlobalDomain AppleShowAllExtensions -bool true
+  preference com.apple.finder ShowPathbar -bool true
+  preference com.apple.finder FXPreferredViewStyle -string Nlsv
+  preference com.apple.finder ShowHardDrivesOnDesktop -bool true
+  preference com.apple.finder ShowMountedServersOnDesktop -bool true
+}
+
+# Preflight every read before writing anything; reread each key before seeding.
+phase=preview
+reviewed_preferences
+if [ "$mode" = --apply ]; then
+  phase=apply
+  reviewed_preferences
+  printf 'Missing preferences seeded; existing values preserved. No apps were restarted.\n'
+  printf 'Running apps/devices may need manual reopening or logout before changes take effect.\n'
+else
+  printf 'Preview only. Use --apply to seed missing reviewed preferences.\n'
+fi

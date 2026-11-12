@@ -8,14 +8,14 @@ run_auto_install = false
 description = "Check shell/Brewfile syntax, ShellCheck errors and Git whitespace without provisioning"
 dir = "{{ config_root }}"
 run = [
-  'for file in bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .path .functions .alias; do bash -n "$file" || exit; done',
+  'for file in bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .macos .path .functions .alias; do bash -n "$file" || exit; done',
   'sh -n .path',
   'sh -n .yabairc',
   'zsh -fn .zshrc',
   'ruby -c .Brewfile',
   'ruby -c Brewfile.app-store',
   'ruby -c Brewfile.desktop',
-  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .path .functions .yabairc',
+  'shellcheck --severity=error bootstrap.sh script/setup script/after-setup script/setup-app-store script/setup-desktop script/setup-git-fuzzy .macos .path .functions .alias .yabairc',
   'git diff --check',
 ]
 
@@ -90,6 +90,15 @@ run = 'bash "{{ config_root }}/bootstrap.sh" --security-apply'
 description = "Explicit macOS update installation; no automatic restart requested, native owner authorization may be required"
 raw = true
 run = 'bash "{{ config_root }}/bootstrap.sh" --macos-updates'
+
+[tasks.macos-defaults]
+description = "Preview reviewed macOS preferences without changing them"
+run = 'bash "{{ config_root }}/.macos" --preview'
+
+[tasks.macos-defaults-apply]
+description = "Seed only missing reviewed preferences; used by normal bootstrap, never CI or app restarts"
+raw = true
+run = 'bash "{{ config_root }}/.macos" --apply'
 
 [tasks.desktop]
 description = "Opt in: install missing Yabai/skhd only; never activate services or alter permissions"

@@ -20,6 +20,14 @@ The entry is **`copy` + `create_if_missing = true`**, with initial mode `0600`, 
 
 The stable `Guid` identifies this profile; its name can be changed locally. Command, working-directory, initial-text, trigger and automatic-host-switch fields are explicitly cleared so a dynamic profile does not inherit remote/automatic actions from a custom default. iTerm watches the directory and reloads changes. The copied dynamic file is the sole profile source; setup must not duplicate it in native `New Bookmarks`. Such a regular copy causes iTerm to reject the dynamic profile and display a GUID-conflict warning. Subsequent setup does not refresh user-owned profile values from Git.
 
+## Option–Arrow word navigation
+
+New copies of the template include only two explicit profile mappings: **Option–Left → Send Escape Sequence `b`**, **Option–Right → Send Escape Sequence `f`**. These match iTerm 3.7.7's bundled **Natural Text Editing** preset entries (`f702-0x280000` / `f703-0x280000`, action `10`). They do not change how other Option keys behave or install the entire preset.
+
+Zsh's Emacs keymap handles these sequences as backward-word / forward-word; a native guest PTY confirmed the resulting cursor movement/edit. Word boundaries need not exactly match Cocoa text fields. `.inputrc` configures Readline, not Zsh.
+
+**Existing editable profile files are not refreshed.** To adopt the mappings there, use iTerm Settings → Profiles → your profile → Keys → Key Mappings and add the two entries above; enter only `b` / `f`, because the action prepends Escape. No running app is terminated or current profile overwritten. Actual iTerm GUI dispatch and physical keyboard forwarding remain unverified for this change.
+
 ## Default-selection policy
 
 `mise run terminal` is called after agent/runtime setup. It behaves conservatively:

@@ -45,7 +45,7 @@ case "$target" in "$HOME"/*|"$CUSTOM_ROOT"/*) mkdir -p "$target" ;; *) exit 91 ;
     mackup: 'printf "mackup\\n" >> "$TRACE"',
     brew: 'printf "%s/nvm\\n" "$FIXTURE"',
     bun: 'printf "agent setup\\n" >> "$TRACE"',
-    mise: 'printf "mise %s\\n" "$*" >> "$TRACE"\n[ "${MISE_STATUS:-0}" = 0 ] || exit "$MISE_STATUS"\ncase "$*" in *"run terminal") exit "${TERMINAL_STATUS:-0}" ;; esac\nprintf "agent setup\\n" >> "$TRACE"',
+    mise: 'printf "mise %s\\n" "$*" >> "$TRACE"\n[ "${MISE_STATUS:-0}" = 0 ] || exit "$MISE_STATUS"\ncase "$*" in *"run terminal") exit "${TERMINAL_STATUS:-0}" ;; *"run macos-defaults-apply") exit "${PREFERENCES_STATUS:-0}" ;; esac\nprintf "agent setup\\n" >> "$TRACE"',
   };
   for (const [name, body] of Object.entries(commands)) {
     writeFileSync(join(directory, 'bin', name), `#!/bin/sh\n${body}\n`, { mode: 0o755 });
@@ -106,6 +106,23 @@ test('terminal task failures are reported after agent setup rather than silently
   expect(result.exitCode).toBe(8);
   expect(result.trace).toContain('agent setup');
   expect(result.trace).toContain('run terminal');
+});
+
+test('normal bootstrap seeds reviewed macOS defaults through the native task', () => {
+  const result = run();
+  expect(result.exitCode).toBe(0);
+  expect(result.trace).toContain('run macos-defaults-apply');
+});
+
+test('bootstrap skips preference writes in CI', () => {
+  const result = run({ CI: '1' });
+  expect(result.exitCode).toBe(0);
+  expect(result.trace).not.toContain('run macos-defaults-apply');
+  expect(result.stdout.toString()).toContain('preferences skipped in CI');
+});
+
+test('preference task failures cannot become a successful bootstrap', () => {
+  expect(run({ PREFERENCES_STATUS: '9' }).exitCode).toBe(9);
 });
 
 test('default setup defers account-dependent restoration so it cannot undo managed shell files', () => {

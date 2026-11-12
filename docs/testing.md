@@ -20,6 +20,12 @@ Bootstrap now declares `/bin/bash`, and the README's download command explicitly
 
 Tests execute the actual file without an interpreter override and execute the exact README command with a controlled download. Only OS/package/network boundaries are replaced, with a fail-closed sudo executable if a shell drops the exported mocks. They cover interpreter selection, successful download execution, download failure and argument forwarding. A bare executable invocation with `--unknown` also exits **2** in the disposable macOS guest before privileged work. These checks do **not** validate the feature branch through the remote `master` URL, or rerun privileged provisioning on the host.
 
+## Reviewed preference stage
+
+[macOS defaults](macos-defaults.md) has a public Bash CLI: preview is read-only, while normal non-CI bootstrap explicitly delegates to its missing-key-only apply task. Ordinary tests replace only the external `defaults`/OS boundary; they never write host preferences. Hook fixtures verify normal delegation, CI skipping and failure propagation. Native reads are preflighted and written values/types verified; existing false/zero/custom values remain untouched.
+
+Guest acceptance uses the actual native CLI and mise tasks with an allowlisted wrapper mapping production domain names to unique synthetic test domains. Eleven typed seeds, repeat/preservation, CI rejection and false-success detection pass. The real application-domain preview and a before/after 94-key allowlist confirm no live guest preference writes; no app/service restart occurs. A separate native Zsh PTY confirms Escape-b/f navigation, not iTerm GUI or physical input. Current ordinary suite: **173 pass /58 skips**, 231 tests/19 files; no full privileged/bootstrap or new full `verify:vm` acceptance is implied. Private evidence: `~/Library/Caches/dotfiles-vm/defaults-review-20261112/`.
+
 ## Continuous integration
 
 [`.github/workflows/verify.yml`](../.github/workflows/verify.yml) defines push, pull-request and manual checks with read-only repository permissions, SHA-pinned checkout/mise actions, no persisted checkout credentials and a 25-minute deadline. It uses the ARM64 `macos-15` image, with an explicit architecture assertion; Intel execution remains separate.
